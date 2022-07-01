@@ -81,8 +81,41 @@ fn main() {
    */
 
    //=========================================================================
+
+   //Option<T> supports iterator
    let a = Some("a",);
    for i in a.iter() {
       println!("{i}");
    }
+
+   //==========================================================================
+
+   //Rust's pattern matching arm & @ binding
+   fn odd(i: i32,) -> bool {
+      if i % 2 == 0 {
+         true
+      } else {
+         false
+      }
+   }
+
+   match 3 {
+      c @ (4..=8 | 33) => println!("{c} is 4..=8 or 33"),
+      c if odd(c,) => println!("{c} is odd"),
+      666 if false => println!("†666†"),
+      c @ (11 | 22) => println!("{c} is 11 or 22"),
+      _ => println!("I know that I know nothing"),
+   }
+
+   //if keyword in match arm & @ binding is similar, but following example is
+   // not compliable
+   /*
+   match 3 {
+      c if (4..=8 | 33) => println!("{c} is 4..=8 or 33"),
+      c @ odd(c,) => println!("{c} is odd"),
+      666 @ false => println!("†666†"),
+      c if (11 | 22) => println!("{c} is 11 or 22"),
+      _ => println!("I know that I know nothing"),
+   }
+   */
 }
