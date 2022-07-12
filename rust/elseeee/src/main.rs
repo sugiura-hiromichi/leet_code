@@ -25,8 +25,8 @@ fn main() {
 
    closure_ornot(return_closure()(),);
 
-   //closure's type is different even arguments and return types are same
-   //this call's "anonymous type"
+   //closure's type is different even arguments and return types are same this
+   // call's "anonymous type"
    let cl1 = || 1;
    let cl2 = || 2;
    println!("{}", cl1.type_id() == cl2.type_id());
@@ -118,4 +118,13 @@ fn main() {
       _ => println!("I know that I know nothing"),
    }
    */
+
+   //==========================================================================
+
+   //Option::map uses raw-value if is Some().
+   //But how about self is None?
+   let mut some_none = None;
+   some_none.map(|_one| panic!("This painc shouldn't be executed"),);
+   some_none = Some(1,);
+   some_none.map(|one| println!("{one}"),);
 }
