@@ -3,6 +3,7 @@ use std::any::{Any, TypeId};
 fn main() {
    //Rust can define function in function, return closure intuitive way by using
    // impl trait.
+
    fn return_closure() -> impl Fn() -> i32 {
       fn fn_in_main() -> impl Fn(String,) -> String { |x| x }
       || fn_in_main()("7".to_string(),).parse::<i32>().unwrap()
