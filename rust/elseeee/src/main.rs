@@ -39,7 +39,7 @@ fn main() {
    fn ret2() -> i32 { 2 }
    println!("{}", ret1.type_id() == ret2.type_id());
 
-   //========================================================================
+   //=============================================================
 
    //rust's trait has alot advanced features:D
    trait MyName {
@@ -73,7 +73,7 @@ fn main() {
    //methods (in this case, is()) are only able to use within defined crate.
    // This guarantees safety
 
-   //==========================================================================
+   //===============================================================
 
    //experiment of behavior of std::io::. Whether read_line rewrite buf or not?
    /*
@@ -83,7 +83,7 @@ fn main() {
    println!("{buf}");
    */
 
-   //=========================================================================
+   //==============================================================
 
    //Option<T> supports iterator
    let a = Some("a",);
@@ -91,7 +91,7 @@ fn main() {
       println!("{i}");
    }
 
-   //==========================================================================
+   //===============================================================
 
    //Rust's pattern matching arm & @ binding
    fn odd(i: i32,) -> bool {
@@ -122,7 +122,7 @@ fn main() {
    }
    */
 
-   //==========================================================================
+   //===============================================================
 
    //Option::map uses raw-value if is Some().
    //But how about self is None?
@@ -130,4 +130,24 @@ fn main() {
    some_none.map(|_one| panic!("This painc shouldn't be executed"),);
    some_none = Some(1,);
    some_none.map(|one| println!("{one}"),);
+
+   //===============================================================
+
+   //Checking idea that returning private method's pointer enables to access private method
+   //Result is bad at rust-nightly 1.64.0
+   let has_prv = HasPrivate { pub_member: 0, private_member: 0, };
+   has_prv.pub_f()();
+}
+
+struct HasPrivate {
+   pub pub_member: usize,
+   private_member: usize,
+}
+impl HasPrivate {
+   pub fn pub_f(self,) -> impl Fn() -> () {
+      //self.prv_fn | this cause error. compiler recognize as field, not method
+      || println!("from pub_f")
+   }
+
+   fn prv_fn(self,) { println!("in plivate function") }
 }
