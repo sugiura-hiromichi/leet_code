@@ -1,3 +1,4 @@
+//!Documentation for crate
 use std::any::{Any, TypeId};
 
 ///Documentation
@@ -133,10 +134,20 @@ fn main() {
 
    //===============================================================
 
-   //Checking idea that returning private method's pointer enables to access private method
-   //Result is bad at rust-nightly 1.64.0
+   //Checking idea that returning private method's pointer enables to access
+   // private method Result is bad at rust-nightly 1.64.0
    let has_prv = HasPrivate { pub_member: 0, private_member: 0, };
    has_prv.pub_f()();
+
+   //Sort result between '-' & alphanumerics
+   let mut string_vecs: Vec<&str,> = vec!["--options", "-h", "--help", "a", "z", "0", "9", "A", "Z"];
+   string_vecs.sort();
+   println!("{:?}", string_vecs);
+
+   //===============================================================
+
+   //Experiment pub(path)'s behavior
+   mod1::allowed_view();
 }
 
 struct HasPrivate {
@@ -150,4 +161,38 @@ impl HasPrivate {
    }
 
    fn prv_fn(self,) { println!("in plivate function") }
+}
+
+pub mod mod1 {
+   //!Documentation for module
+   pub mod mod2 {
+      pub(in crate::mod1) fn visible() {
+         println!("mod1::mod2::visible()");
+      }
+
+      pub(in crate::mod1::mod2) fn only_in_mod3() {
+         println!("mod1::only_in_mod3()");
+      }
+
+      pub mod mod3 {
+         fn in_mod3() {}
+      }
+   }
+
+   pub mod mod4 {
+      pub mod mod5 {
+         fn private_fn() {}
+      }
+   }
+
+   pub fn allowed_view() {
+      println!("calling from mod1::allowed_view()---------");
+      mod2::visible();
+   }
+
+   pub struct InMod1 {}
+}
+
+pub mod mod6 {
+   pub fn in_mod6() {}
 }
