@@ -1,5 +1,10 @@
+#![allow(unused)]
+
 //!Documentation for crate
-use std::any::{Any, TypeId};
+use std::{
+   any::{Any, TypeId},
+   env::args,
+};
 
 ///Documentation
 fn main() {
@@ -40,7 +45,7 @@ fn main() {
    fn ret2() -> i32 { 2 }
    println!("{}", ret1.type_id() == ret2.type_id());
 
-   //=============================================================
+   ///=============================================================
 
    //rust's trait has alot advanced features:D
    trait MyName {
@@ -74,7 +79,7 @@ fn main() {
    //methods (in this case, is()) are only able to use within defined crate.
    // This guarantees safety
 
-   //===============================================================
+   ///===============================================================
 
    //experiment of behavior of std::io::. Whether read_line rewrite buf or not?
    /*
@@ -84,15 +89,14 @@ fn main() {
    println!("{buf}");
    */
 
-   //==============================================================
-
+   ///==============================================================
    //Option<T> supports iterator
    let a = Some("a",);
    for i in a.iter() {
       println!("{i}");
    }
 
-   //===============================================================
+   ///===============================================================
 
    //Rust's pattern matching arm & @ binding
    fn odd(i: i32,) -> bool {
@@ -123,8 +127,7 @@ fn main() {
    }
    */
 
-   //===============================================================
-
+   ///===============================================================
    //Option::map uses raw-value if is Some().
    //But how about self is None?
    let mut some_none = None;
@@ -132,8 +135,7 @@ fn main() {
    some_none = Some(1,);
    some_none.map(|one| println!("{one}"),);
 
-   //===============================================================
-
+   ///===============================================================
    //Checking idea that returning private method's pointer enables to access
    // private method Result is bad at rust-nightly 1.64.0
    let has_prv = HasPrivate { pub_member: 0, private_member: 0, };
@@ -144,10 +146,16 @@ fn main() {
    string_vecs.sort();
    println!("{:?}", string_vecs);
 
-   //===============================================================
-
+   ///===============================================================
    //Experiment pub(path)'s behavior
    mod1::allowed_view();
+
+   ///===============================================================
+   //env::arg
+   let argsss = args();
+   println!("{:?}", argsss);
+   let argu = args();
+   println!("{:?}", argu);
 }
 
 struct HasPrivate {
