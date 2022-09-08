@@ -4,6 +4,13 @@ use std::{
 	any::{Any, TypeId},
 	env::args,
 };
+
+///Confirmation of semantic highlight
+enum SemTili {
+	NonTuple,
+	TupleMem(),
+}
+
 ///Documentation
 fn main() {
 	//Rust can define function in function, return closure intuitive way by using
@@ -171,8 +178,18 @@ fn main() {
 	println!("{:?}", argsss);
 	let argu = args();
 	println!("{:?}", argu);
-}
 
+	///===============================================================
+	//bool::then method
+	println!(
+		"{:?}",
+		(0 == 0).then(|| 0)
+	);
+	println!(
+		"{:?}",
+		(1 == 0).then(|| 0)
+	);
+}
 struct HasPrivate {
 	pub pub_member: usize,
 	private_member: usize,

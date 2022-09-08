@@ -8,6 +8,10 @@
 
 `pmset -g batt` outputs battery percentage
 
+### Modify Brightness & Volume Slightly
+
+*function key* with Option+Shift.
+
 ---
 
 ## Shell
@@ -55,10 +59,12 @@ Since 2018 Edition, `path` for `pub(path)` must start with crate, super.
 
 ### Todo highlight
 
->see https://qiita.com/skkzsh/items/fe40e06c0d4943389be1
+>see <https://qiita.com/skkzsh/items/fe40e06c0d4943389be1>
 
 In rust file, TODO, FIXME, XXX, NB, NOTE in comment is highlighted.
-This is defined in `$VIMRUNTIME/syntax/rust.vim`.  
-**For other languages, in `$VIMRUNTIME/syntax/(language name).vim`.**
+This is defined in `$VIMRUNTIME/syntax/rust.vim`.
+
+>**For other languages, in `$VIMRUNTIME/syntax/(language name).vim`.**
+
 For example, in lua file, TODO, FIXME, XXX in comment is highlighted
 as defined in  `$VIMRUNTIME/syntax/lua.vim`
