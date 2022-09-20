@@ -68,3 +68,8 @@ This is defined in `$VIMRUNTIME/syntax/rust.vim`.
 
 For example, in lua file, TODO, FIXME, XXX in comment is highlighted
 as defined in  `$VIMRUNTIME/syntax/lua.vim`
+
+### Mode as a Mothion
+
+In Normal mode, typing `v` enter visual mode. Then type `iw` selects word the cursor is currently on.
+Other example, typing `vi"` selects inner " .. ".
