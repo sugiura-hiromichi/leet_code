@@ -5,6 +5,7 @@
 
 ### Progress visualize
 
+- Make my own color scheme
 - Reach 120 average wpm typing speed
 - Write about Rust Tech article & post it to the internet
 
