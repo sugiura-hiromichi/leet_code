@@ -68,3 +68,16 @@ This is defined in `$VIMRUNTIME/syntax/rust.vim`.
 
 For example, in lua file, TODO, FIXME, XXX in comment is highlighted
 as defined in  `$VIMRUNTIME/syntax/lua.vim`
+
+### Statusline
+
+opt.statusline=3 lets global statusline
+
+### vim.log.levels
+
+vim.log.levels.DEBUG	1
+vim.log.levels.ERROR	4
+vim.log.levels.INFO	2
+vim.log.levels.TRACE	0
+vim.log.levels.WARN	3
+vim.log.levels.OFF	5
