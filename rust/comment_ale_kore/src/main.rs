@@ -49,7 +49,7 @@ mod commented_module {
 /// # Safety
 fn main() {
 	//This is normal Comment
-	//TODO
+	// TODO
 	//FIXME
 	//XXX -> todo or fixme
 	//NB -> Emphasizing
