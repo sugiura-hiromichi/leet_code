@@ -1,9 +1,8 @@
 #![allow(unused)]
 //!Documentation for crate
-use std::{
-   any::{Any, TypeId},
-   env::args,
-};
+use std::any::Any;
+use std::any::TypeId;
+use std::env::args;
 
 ///Confirmation of semantic highlight
 enum SemTili {
@@ -15,6 +14,7 @@ enum SemTili {
 fn main() {
    //Rust can define function in function, return closure intuitive way by using
    // impl trait.
+   // TODO
 
    ///This returns closure
    fn return_closure() -> impl Fn() -> i32 {
@@ -167,6 +167,15 @@ fn main() {
    //bool::then method
    println!("{:?}", (0 == 0).then(|| 0));
    println!("{:?}", (1 == 0).then(|| 0));
+
+   ///===============================================================
+   //difference of map() & flat_map()
+   let vector = vec![0, 1, 2, 3, 4, 5];
+   let from_map = vector.iter().map(|n| n * 2,);
+   let vecvec = vec![vector.clone(); 5];
+   let from_flat_map: Vec<&u8,> = vecvec.iter().flat_map(|i| i,).collect();
+   println!("from map: {:?}", from_map);
+   println!("from flat_map: {:?}", from_flat_map);
 }
 struct HasPrivate {
    pub pub_member: usize,

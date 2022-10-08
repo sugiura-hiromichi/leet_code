@@ -53,6 +53,21 @@ execute builtin command
 
 Since 2018 Edition, `path` for `pub(path)` must start with crate, super.
 
+### Treatment of lib.rs
+
+lib.rs & main.rs is treated as different crate.
+
+### p formatting
+
+>see [more detail](https://doc.rust-lang.org/core/fmt/trait.Pointer.html)
+
+show pointer's memory location by using p formatting.
+
+```rust
+let x = &42;
+let address = format!("{x:p}"); // this produces something like '0x7f06092ac6d0'
+```
+
 ---
 
 ## Vim
@@ -69,7 +84,7 @@ This is defined in `$VIMRUNTIME/syntax/rust.vim`.
 For example, in lua file, TODO, FIXME, XXX in comment is highlighted
 as defined in  `$VIMRUNTIME/syntax/lua.vim`
 
-### Mode as a Mothion
+### Mode as a Motion
 
 In Normal mode, typing `v` enter visual mode. Then type `iw` selects word the cursor is currently on.
 Other example, typing `vi"` selects inner " .. ".
