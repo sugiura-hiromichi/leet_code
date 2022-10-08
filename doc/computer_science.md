@@ -12,6 +12,11 @@
 
 *function key* with Option+Shift.
 
+### Sound & Display Option ShortCut
+
+`option + f10 (or f11 or f12)` opens sound page of system settings. 
+`option + f1 (or f2)` opens display page of system settings. 
+
 ---
 
 ## Shell
@@ -57,7 +62,22 @@ Since 2018 Edition, `path` for `pub(path)` must start with crate, super.
 
 lib.rs & main.rs is treated as different crate.
 
-### p formatting
+### Formatting Modifier
+
+At least rust 1.66.0(nightly), identifier shortcut & format Modifier can coexist within `{}`.
+
+>example
+```rust
+let tntn="0tintin"
+println!("this is tintin: {tntn}");
+println!("this is raw tintin: {tntn:?}");
+```
+
+this code prints to stdout that  
+`this is tintin: 0tintin
+this is raw tintin: "0tintin"`
+
+#### p formatting
 
 >see [more detail](https://doc.rust-lang.org/core/fmt/trait.Pointer.html)
 

@@ -7,7 +7,7 @@ use std::env::args;
 ///Confirmation of semantic highlight
 enum SemTili {
    NonTuple,
-   TupleMem(),
+   TupleMem(u8,),
 }
 
 ///Documentation
@@ -15,6 +15,12 @@ fn main() {
    //Rust can define function in function, return closure intuitive way by using
    // impl trait.
    // TODO
+
+   ///=============================================================
+   //formatting modifier
+   let printout = "printout";
+   println!("printout: {printout}");
+   println!("printout:?: {printout:?}");
 
    ///This returns closure
    fn return_closure() -> impl Fn() -> i32 {
