@@ -119,4 +119,4 @@ Other example, typing `vi"` selects inner " .. ".
 
 ## Get filetype as variable
 
-`vim.bo.filetype`
+`vim.bo.filetype` returns filetype name as string. For example, if current buffer is init.lua, vim.bo.filetype=='lua'
