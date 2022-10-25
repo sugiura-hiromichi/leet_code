@@ -1,4 +1,3 @@
-bgm素材、ご注文はRawstyleですか？を使っていただきましたー。
+leet_codeバグった? <https://leetcode.com/problems/longest-substring-without-repeating-characters/submissions/818502053/>
 
-後、私事ですが
-ニコニコの動画共有を介してのみこのアカウントに繋がることができるというLifeHackを得ました。助けて。
+isn't that bananas?: [訳] そんなバナナ（マジ）
