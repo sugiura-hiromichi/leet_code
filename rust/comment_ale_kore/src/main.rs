@@ -50,9 +50,13 @@ mod commented_module {
 fn main() {
    //This is normal Comment
    // TODO:
-   //FIXME:
-   //XXX: -> todo or fixme
-   //NB -> Emphasizing
-   //NOTE  these are specially highlighted by vim
+   // IDEA: idea
+   // FIX: fix
+   // XXX: -> todo or fixme
+   // NOTE: -> Emphasizing
+   // INFO:
+   // HACK:  these are specially highlighted by vim
+   // CASE:
+   // OPT: optimize
    println!("Hello, world!");
 }
