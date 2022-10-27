@@ -34,10 +34,10 @@
 //! |right_align|centered|left_align|
 
 mod commented_module {
-	//! This is DocComment for module
+   //! This is DocComment for module
 
-	//! This is DocComment for struct
-	struct CommentedStruct {}
+   //! This is DocComment for struct
+   struct CommentedStruct {}
 }
 
 /// This is normal DocComment
@@ -48,11 +48,11 @@ mod commented_module {
 ///
 /// # Safety
 fn main() {
-	//This is normal Comment
-	// TODO
-	//FIXME
-	//XXX -> todo or fixme
-	//NB -> Emphasizing
-	//NOTE  these are specially highlighted by vim
-	println!("Hello, world!");
+   //This is normal Comment
+   // TODO:
+   //FIXME:
+   //XXX: -> todo or fixme
+   //NB -> Emphasizing
+   //NOTE  these are specially highlighted by vim
+   println!("Hello, world!");
 }

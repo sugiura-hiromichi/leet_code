@@ -11,27 +11,43 @@ impl Solution {
 
          if s[i] == p[i] {
             i += 1;
+
             //from here, s[i] != p[i]
          } else if p[i] == b'.' {
             if i + 1 >= p.len() {
-               // BUG: 8 early return occurs here
                p[i] = s[i];
             } else {
                if p[i + 1] == b'*' {
                   let pat = Solution::sub_pat(&p[i + 2..],);
 
                   if pat.len() == 0 {
-                     return true;
+                     let mut l = 2;
+                     let mut min = 0;
+                     loop {
+                        if p[i + l] == b'*' {
+                           min -= 1;
+                        } else if p[i + l] == b'.' {
+                           min += 1;
+                        } else {
+                           break;
+                        }
+                        l += 1;
+                     }
+
+                     if i + min >= s.len() {
+                        return false;
+                     }
                   }
 
-                  if let Some(len,) = Solution::match_sub(&s[i + 2..], pat,) {
-                     let fill = &s[i + 2..i + 2 + len];
+                  if let Some(len,) = Solution::match_sub(&s[i..], pat,) {
+                     let fill = &s[i..i + len];
                      let (l, r,) = (&p[..i], &p[i + 2..],);
                      let pat_len = pat.len();
                      p = [l, fill, r,].concat();
-                     i += 2 + len + pat_len;
+                     i += len + pat_len;
                   } else {
-                     return false;
+                     p.remove(i,);
+                     p.remove(i,);
                   }
                } else {
                   p[i] = s[i];
@@ -41,7 +57,7 @@ impl Solution {
          } else if p[i] == b'*' {
             //remind p[i-1] !=b'.'
             if i + 1 >= p.len() {
-               //NB p[i+1] may out of range
+               // NOTE: p[i+1] may out of range
                return !s[i..].iter().any(|&u| u != p[i - 1],);
             }
             if p[i - 1] == p[i + 1] {
@@ -60,7 +76,7 @@ impl Solution {
                }
             } else {
                let pat = Solution::sub_pat(&p[i + 1..],);
-               if pat == &[] {
+               if pat == &[] as &[u8] {
                   let s_rep = Solution::repeat_length(&s[i..], p[i - 1],);
                   p = [&p[..i], &s[i..i + s_rep], &p[i + 1..],].concat();
                   i += s_rep;
@@ -71,8 +87,12 @@ impl Solution {
                   p = [&p[..i], &s[i..=i].repeat(l,), &p[i + 1..],].concat();
                   i += l;
                } else {
-                  println!("i is {i}");
-                  return false;
+                  if pat.len() == 1 && i + 2 < p.len() && p[i + 2] == b'*' {
+                     p.remove(i + 1,);
+                     p.remove(i + 1,);
+                  } else {
+                     return false;
+                  }
                }
             }
          } else if i + 1 < p.len() && p[i + 1] == b'*' {
@@ -83,7 +103,9 @@ impl Solution {
          }
       }
 
-      //println!("s={s:?}, p={p:?}");
+      // CASE: s:"a", p:"ab*". This is true. but returns false if do noting
+      p = Solution::trim_tail(&p, s.len(),);
+      println!("s= {s:?}, p= {p:?}");
       s == p
    }
 
@@ -119,13 +141,58 @@ impl Solution {
       }
       return s.len();
    }
+
+   fn trim_tail(p: &[u8], s_len: usize,) -> Vec<u8,> {
+      if p.len() == s_len {
+         return p.to_vec();
+      }
+      let tail = &p[s_len..];
+
+      // CASE: Below for loop does not consider tail.len==1. Treat here.
+      if tail.len() == 1 {
+         if tail == &[b'*',] {
+            return p[..s_len].to_vec();
+         } else {
+            return p.to_vec();
+         }
+      }
+
+      for i in 0..tail.len() - 1 {
+         if tail[i] != b'*' && tail[i + 1] != b'*' {
+            return p.to_vec();
+         }
+      }
+
+      if tail[tail.len() - 1] != b'*' {
+         if tail[0] == b'*' {
+            [&p[..s_len - 1], &p[p.len() - 1..p.len()],].concat()
+         } else {
+            p.to_vec()
+         }
+      } else {
+         p[..s_len].to_vec()
+      }
+   }
 }
 
 fn main() {
+   println!("1-------");
+   assert_eq!(Solution::is_match("bbbba".to_string(), ".*a*a".to_string()), true);
+   println!("2-------");
+   assert_eq!(Solution::is_match("a".to_string(), ".*..a*".to_string()), false);
+
    println!("7-------");
    assert_eq!(Solution::is_match("mississippi".to_string(), "mis*is*ip*.".to_string()), true);
    println!("8-------");
    assert_eq!(Solution::is_match("mississippi".to_string(), "mis*is*p*.".to_string()), false);
    println!("9-------");
    assert_eq!(Solution::is_match("aaa".to_string(), "ab*a*c*a".to_string()), true);
+   println!("10-------");
+   assert_eq!(Solution::is_match("a".to_string(), "ab*".to_string()), true);
+   println!("11-------");
+   assert_eq!(Solution::is_match("a".to_string(), "a*".to_string()), true);
+   println!("12-------");
+   assert_eq!(Solution::is_match("aaa".to_string(), "aaaa".to_string()), false);
+   println!("13-------");
+   assert_eq!(Solution::is_match("a".to_string(), "ab*a".to_string()), false);
 }
