@@ -6,15 +6,12 @@ impl Solution {
 			.iter()
 			.filter_map(|&k| {
 				if let Some(v,) = nlist.insert(k, 1,) {
-					if v < 3 {
-						nlist.insert(k, v + 1,);
-						Some(k,)
-					} else {
-						None
+					if v >= 3 {
+						return None;
 					}
-				} else {
-					None
+					nlist.insert(k, v + 1,);
 				}
+				Some(k,)
 			},)
 			.collect();
 		nums.sort();
@@ -53,10 +50,10 @@ impl Solution {
 }
 
 fn main() {
-	assert_eq!(
-		Solution::three_sum(vec![-1, 0, 1, 2, -1, -4]),
-		vec![vec![-1, -1, 2], vec![-1, 0, 1],]
-	);
+	println!("0----");
+	assert_eq!(Solution::three_sum(vec![-1, 0, 1, 2, -1, -4]), [[-1, -1, 2], [-1, 0, 1],]);
 	println!("1----");
-	assert_eq!(Solution::three_sum(vec![0, 0, 0]), vec![vec![0, 0, 0]]);
+	assert_eq!(Solution::three_sum(vec![0, 0, 0]), [[0, 0, 0]]);
+	println!("2----");
+	assert_eq!(Solution::three_sum(vec![0, 0, 0, 0]), [[0, 0, 0]]);
 }
