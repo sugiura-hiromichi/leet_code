@@ -1,59 +1,56 @@
+#![allow(dead_code)]
 struct Solution;
 impl Solution {
-	pub fn three_sum(nums: Vec<i32,>,) -> Vec<Vec<i32,>,> {
-		let mut nlist = std::collections::HashMap::new();
-		let mut nums: Vec<i32,> = nums
-			.iter()
-			.filter_map(|&k| {
-				if let Some(v,) = nlist.insert(k, 1,) {
-					if v >= 3 {
-						return None;
-					}
-					nlist.insert(k, v + 1,);
-				}
-				Some(k,)
-			},)
-			.collect();
+	pub fn three_sum_closest(nums: Vec<i32,>, target: i32,) -> i32 {
+		let mut nearest = nums[0] + nums[1] + nums[2];
+		let mut nums = nums;
 		nums.sort();
 
-		// FIXME:
-		let mut veclist = std::collections::HashSet::new();
 		for i in 0..nums.len() - 2 {
-			for j in i + 1..nums.len() - 1 {
-				let k = -nums[i] - nums[j];
-				if k < 0 || nums[i] + nums[j] * 2 > 0 {
-					break;
+			let Some((mut j,mut k))=(i==0 || nums[i]!=nums[i-1]).then(|| (i+1,nums.len()-1)) else{
+            continue;
+         };
+
+			while j < k {
+				let tmp_sum = nums[i] + nums[j] + nums[k];
+
+				if (tmp_sum - target).abs() < (nearest - target).abs() {
+					nearest = tmp_sum;
 				}
-				if let Some(v,) = nlist.get(&k,) {
-					if k == nums[i] {
-						if k == nums[j] {
-							if *v > 2 {
-								veclist.insert(vec![nums[i], nums[j], k],);
-							}
-						} else if *v > 1 {
-							veclist.insert(vec![nums[i], nums[j], k],);
-						}
-					} else {
-						veclist.insert(vec![nums[i], nums[j], k],);
-					}
+
+				if tmp_sum == target {
+					return target;
+				}
+				if tmp_sum > target {
+					k -= 1;
+				} else {
+					j += 1;
 				}
 			}
 		}
 
-		let mut vec = vec![];
-		for v in veclist {
-			vec.push(v,);
-		}
-
-		vec
+		nearest
 	}
 }
 
-fn main() {
-	println!("0----");
-	assert_eq!(Solution::three_sum(vec![-1, 0, 1, 2, -1, -4]), [[-1, -1, 2], [-1, 0, 1],]);
-	println!("1----");
-	assert_eq!(Solution::three_sum(vec![0, 0, 0]), [[0, 0, 0]]);
-	println!("2----");
-	assert_eq!(Solution::three_sum(vec![0, 0, 0, 0]), [[0, 0, 0]]);
+fn main() {}
+
+#[cfg(test)]
+mod tests {
+	use super::*;
+
+	#[test]
+	fn test_1() {
+		assert_eq!(Solution::three_sum_closest(vec![0, 0, 0], 1), 0);
+	}
+
+	#[test]
+	fn test_2() {
+		assert_eq!(Solution::three_sum_closest(vec![-1, 2, 1, -4], 1), 2);
+	}
+
+	#[test]
+	fn test_3() {
+		assert_eq!(Solution::three_sum_closest(vec![1, 1, 1, 0], -100), 2);
+	}
 }
