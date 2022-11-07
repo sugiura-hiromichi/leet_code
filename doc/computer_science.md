@@ -96,6 +96,24 @@ for (i,j) in x.zip(y){
 
 as shown above, `zip()` method combines two iterator into single tuple iterator.
 
+## `flat_map()` is not `flattern().map()`. It's `map().flattern()`
+
+As document shows, `flat_map()` behaves not as taking flattern iterator. It behaves as flattern it's own outputs.
+Thus, below code is valid
+
+```rust
+let some_vector=vec![0,1,2,3,4,5,6];
+let another=vec![10,20,30,40];
+some_vector.iter().flat_map(|i|{
+    another.iter().map(|j| i+j)
+    //this collect() has no effect to output
+    //.collect()
+}).collect();
+```
+
+as shown above, `flat_map()` receives iterator of i32. And takes closure which returns iterator.
+`flat_map()` flatterns this **iterator of iterator**
+
 ---
 
 # Vim
@@ -120,3 +138,25 @@ Other example, typing `vi"` selects inner " .. ".
 ## Get filetype as variable
 
 `vim.bo.filetype` returns filetype name as string. For example, if current buffer is init.lua, vim.bo.filetype=='lua'
+
+## user_commands arguments
+
+If you want to pass ambiguous number of arguments to user_command, set `nargs='*'`
+
+## Telescope Tag Filtering
+
+Press `<c-l>` when entering a picker, some pickers provide tag filtering and it enables filtering picked list.
+
+---
+
+# Markdown
+
+## code block with filename
+
+Here is example.
+
+```rust:code_block.rs
+fn block(){
+   println("block..");
+}
+```
