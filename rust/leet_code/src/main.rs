@@ -1,35 +1,40 @@
 #![allow(dead_code)]
 struct Solution;
 impl Solution {
-	pub fn three_sum_closest(nums: Vec<i32,>, target: i32,) -> i32 {
-		let mut nearest = nums[0] + nums[1] + nums[2];
-		let mut nums = nums;
-		nums.sort();
+	pub fn letter_combinations(digits: String,) -> Vec<String,> {
+		let push_list = std::collections::HashMap::from([
+			('2', "abc",),
+			('3', "def",),
+			('4', "ghi",),
+			('5', "jkl",),
+			('6', "mno",),
+			('7', "pqrs",),
+			('8', "tuv",),
+			('9', "wxyz",),
+		],);
 
-		for i in 0..nums.len() - 2 {
-			let Some((mut j,mut k))=(i==0 || nums[i]!=nums[i-1]).then(|| (i+1,nums.len()-1)) else{
-            continue;
-         };
-
-			while j < k {
-				let tmp_sum = nums[i] + nums[j] + nums[k];
-
-				if (tmp_sum - target).abs() < (nearest - target).abs() {
-					nearest = tmp_sum;
-				}
-
-				if tmp_sum == target {
-					return target;
-				}
-				if tmp_sum > target {
-					k -= 1;
-				} else {
-					j += 1;
-				}
-			}
+		let mut combs: Vec<String,> = vec!["".to_string()];
+		for dig in digits.chars() {
+			combs = push_list
+				.get(&dig,)
+				.unwrap()
+				.chars()
+				.flat_map(|c| {
+					combs.iter().map(move |s| {
+						let mut s = s.clone();
+						s.push(c,);
+						s
+					},)
+					//		.collect::<Vec<String,>>()
+				},)
+				.collect::<Vec<String,>>();
 		}
 
-		nearest
+		if combs == vec!["".to_string()] {
+			vec![]
+		} else {
+			combs
+		}
 	}
 }
 
@@ -41,16 +46,23 @@ mod tests {
 
 	#[test]
 	fn test_1() {
-		assert_eq!(Solution::three_sum_closest(vec![0, 0, 0], 1), 0);
+		let mut sol = Solution::letter_combinations("23".to_string(),);
+		sol.sort();
+		assert_eq!(sol, ["ad", "ae", "af", "bd", "be", "bf", "cd", "ce", "cf"]);
 	}
 
 	#[test]
 	fn test_2() {
-		assert_eq!(Solution::three_sum_closest(vec![-1, 2, 1, -4], 1), 2);
+		let empty: Vec<String,> = vec![];
+		let mut sol = Solution::letter_combinations("".to_string(),);
+		sol.sort();
+		assert_eq!(sol, empty);
 	}
 
 	#[test]
 	fn test_3() {
-		assert_eq!(Solution::three_sum_closest(vec![1, 1, 1, 0], -100), 2);
+		let mut sol = Solution::letter_combinations("2".to_string(),);
+		sol.sort();
+		assert_eq!(sol, ["a", "b", "c"]);
 	}
 }
