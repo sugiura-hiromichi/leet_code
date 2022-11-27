@@ -1,40 +1,48 @@
-#![allow(dead_code)]
+#![allow(unused, dead_code)]
 struct Solution;
+
+#[derive(PartialEq, Eq, Clone, Debug,)]
+pub struct ListNode {
+	pub val:  i32,
+	pub next: Option<Box<ListNode,>,>,
+}
+
+impl ListNode {
+	#[inline]
+	fn new(val: i32,) -> Self { ListNode { next: None, val, } }
+}
+
+impl Iterator for ListNode {
+	type Item = Box<ListNode,>;
+
+	fn next(&mut self,) -> Option<Self::Item,> { self.clone().next }
+}
+
 impl Solution {
-	pub fn letter_combinations(digits: String,) -> Vec<String,> {
-		let push_list = std::collections::HashMap::from([
-			('2', "abc",),
-			('3', "def",),
-			('4', "ghi",),
-			('5', "jkl",),
-			('6', "mno",),
-			('7', "pqrs",),
-			('8', "tuv",),
-			('9', "wxyz",),
-		],);
+	pub fn remove_nth_from_end(
+		mut head: Option<Box<ListNode,>,>,
+		n: i32,
+	) -> Option<Box<ListNode,>,> {
+		let mut pos = 1;
+		let mut target = head.as_ref();
+		// Calculate position to remove
+		while target.is_some() {
+			pos += 1;
+			target = target.unwrap().next.as_ref();
+		}
+		pos -= n;
 
-		let mut combs: Vec<String,> = vec!["".to_string()];
-		for dig in digits.chars() {
-			combs = push_list
-				.get(&dig,)
-				.unwrap()
-				.chars()
-				.flat_map(|c| {
-					combs.iter().map(move |s| {
-						let mut s = s.clone();
-						s.push(c,);
-						s
-					},)
-					//		.collect::<Vec<String,>>()
-				},)
-				.collect::<Vec<String,>>();
+		// Go to Nth node from end
+		let mut target = head.as_mut();
+		for _ in 0..pos {
+			target = target.unwrap().next.as_mut();
 		}
 
-		if combs == vec!["".to_string()] {
-			vec![]
-		} else {
-			combs
-		}
+		// Remove
+		let mut rm = target;
+		rm = rm.unwrap().next.as_mut();
+
+		head
 	}
 }
 
@@ -46,23 +54,8 @@ mod tests {
 
 	#[test]
 	fn test_1() {
-		let mut sol = Solution::letter_combinations("23".to_string(),);
-		sol.sort();
-		assert_eq!(sol, ["ad", "ae", "af", "bd", "be", "bf", "cd", "ce", "cf"]);
-	}
-
-	#[test]
-	fn test_2() {
-		let empty: Vec<String,> = vec![];
-		let mut sol = Solution::letter_combinations("".to_string(),);
-		sol.sort();
-		assert_eq!(sol, empty);
-	}
-
-	#[test]
-	fn test_3() {
-		let mut sol = Solution::letter_combinations("2".to_string(),);
-		sol.sort();
-		assert_eq!(sol, ["a", "b", "c"]);
+		let mut ans = 0;
+		let mut sol = 0;
+		assert_eq!(sol, ans);
 	}
 }

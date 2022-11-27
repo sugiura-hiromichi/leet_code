@@ -1,3 +1,4 @@
 -- INFO: This file is `test.lua`
 
-assert(false, 'This will prompted')
+assert(true, 'This will prompted')
+assert(false, 'This will not prompted')
