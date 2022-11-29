@@ -23,7 +23,7 @@ impl Solution {
 		mut head: Option<Box<ListNode,>,>,
 		n: i32,
 	) -> Option<Box<ListNode,>,> {
-		let mut pos = 1;
+		let mut pos = 0;
 		let mut target = head.as_ref();
 		// Calculate position to remove
 		while target.is_some() {
@@ -32,17 +32,19 @@ impl Solution {
 		}
 		pos -= n;
 
-		// Go to Nth node from end
-		let mut target = head.as_mut();
-		for _ in 0..pos {
-			target = target.unwrap().next.as_mut();
-		}
+		// NOTE: this `unwrap()` always success because first Node is always Some()
+		list_to_list(Some(Box::new(ListNode { val: 0, next: head, },),), pos,).unwrap().next
+	}
+}
 
-		// Remove
-		let mut rm = target;
-		rm = rm.unwrap().next.as_mut();
-
-		head
+/// INFO: create list by recursion ignoring if n==0
+fn list_to_list(l: Option<Box<ListNode,>,>, n: i32,) -> Option<Box<ListNode,>,> {
+	match l {
+		None => None,
+		Some(nod,) => Some(Box::new(ListNode {
+			val:  nod.val,
+			next: list_to_list(if n == 0 { nod.next.unwrap().next } else { nod.next }, n - 1,),
+		},),),
 	}
 }
 
@@ -52,10 +54,33 @@ fn main() {}
 mod tests {
 	use super::*;
 
+	// NOTE: helper `fn` for test
+	fn ary_to_list(ary: &[i32],) -> Option<Box<ListNode,>,> {
+		if ary.len() == 0 {
+			None
+		} else {
+			Some(Box::new(ListNode { val: ary[0], next: ary_to_list(&ary[1..],), },),)
+		}
+	}
+
 	#[test]
 	fn test_1() {
-		let mut ans = 0;
-		let mut sol = 0;
-		assert_eq!(sol, ans);
+		let mut ans = ary_to_list(&[1, 2, 3, 5,],);
+		let mut sol = Solution::remove_nth_from_end(ary_to_list(&[1, 2, 3, 4, 5,],), 2,);
+		assert_eq!(ans, sol);
+	}
+
+	#[test]
+	fn test_2() {
+		let mut ans = ary_to_list(&[],);
+		let mut sol = Solution::remove_nth_from_end(ary_to_list(&[1,],), 1,);
+		assert_eq!(ans, sol);
+	}
+
+	#[test]
+	fn test_3() {
+		let mut ans = ary_to_list(&[1,],);
+		let mut sol = Solution::remove_nth_from_end(ary_to_list(&[1, 2,],), 1,);
+		assert_eq!(ans, sol);
 	}
 }
