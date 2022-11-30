@@ -1,5 +1,4 @@
 #![allow(unused, dead_code)]
-struct Solution;
 
 #[derive(PartialEq, Eq, Clone, Debug,)]
 pub struct ListNode {
@@ -12,39 +11,36 @@ impl ListNode {
 	fn new(val: i32,) -> Self { ListNode { next: None, val, } }
 }
 
-impl Iterator for ListNode {
-	type Item = Box<ListNode,>;
-
-	fn next(&mut self,) -> Option<Self::Item,> { self.clone().next }
-}
-
+struct Solution;
 impl Solution {
-	pub fn remove_nth_from_end(
-		mut head: Option<Box<ListNode,>,>,
-		n: i32,
+	pub fn merge_two_lists(
+		mut list1: Option<Box<ListNode,>,>,
+		mut list2: Option<Box<ListNode,>,>,
 	) -> Option<Box<ListNode,>,> {
-		let mut pos = 0;
-		let mut target = head.as_ref();
-		// Calculate position to remove
-		while target.is_some() {
-			pos += 1;
-			target = target.unwrap().next.as_ref();
+		let mut merge = ListNode::new(0,);
+		let mut p = &mut merge.next;
+		loop {
+			match (list1.clone(), list2.clone(),) {
+				(None, None,) => break,
+				(None, mut nxt,) | (mut nxt, None,) => {
+					*p = nxt;
+					break;
+				},
+				(Some(one,), Some(two,),) => {
+					if one.val < two.val {
+						*p = Some(Box::new(ListNode::new(one.val,),),);
+						list1 = list1.unwrap().next;
+					} else {
+						*p = Some(Box::new(ListNode::new(two.val,),),);
+						list2 = list2.unwrap().next;
+					}
+
+					p = &mut p.as_mut().unwrap().next;
+				},
+			}
 		}
-		pos -= n;
 
-		// NOTE: this `unwrap()` always success because first Node is always Some()
-		list_to_list(Some(Box::new(ListNode { val: 0, next: head, },),), pos,).unwrap().next
-	}
-}
-
-/// INFO: create list by recursion ignoring if n==0
-fn list_to_list(l: Option<Box<ListNode,>,>, n: i32,) -> Option<Box<ListNode,>,> {
-	match l {
-		None => None,
-		Some(nod,) => Some(Box::new(ListNode {
-			val:  nod.val,
-			next: list_to_list(if n == 0 { nod.next.unwrap().next } else { nod.next }, n - 1,),
-		},),),
+		merge.next
 	}
 }
 
@@ -54,7 +50,6 @@ fn main() {}
 mod tests {
 	use super::*;
 
-	// NOTE: helper `fn` for test
 	fn ary_to_list(ary: &[i32],) -> Option<Box<ListNode,>,> {
 		if ary.len() == 0 {
 			None
@@ -65,22 +60,28 @@ mod tests {
 
 	#[test]
 	fn test_1() {
-		let mut ans = ary_to_list(&[1, 2, 3, 5,],);
-		let mut sol = Solution::remove_nth_from_end(ary_to_list(&[1, 2, 3, 4, 5,],), 2,);
+		let list1 = ary_to_list(&[1, 2, 4,],);
+		let list2 = ary_to_list(&[1, 3, 4,],);
+		let mut ans = ary_to_list(&[1, 1, 2, 3, 4, 4,],);
+		let mut sol = Solution::merge_two_lists(list1, list2,);
 		assert_eq!(ans, sol);
 	}
 
 	#[test]
 	fn test_2() {
+		let list1 = ary_to_list(&[],);
+		let list2 = ary_to_list(&[],);
 		let mut ans = ary_to_list(&[],);
-		let mut sol = Solution::remove_nth_from_end(ary_to_list(&[1,],), 1,);
+		let mut sol = Solution::merge_two_lists(list1, list2,);
 		assert_eq!(ans, sol);
 	}
 
 	#[test]
 	fn test_3() {
+		let list1 = ary_to_list(&[],);
+		let list2 = ary_to_list(&[1,],);
 		let mut ans = ary_to_list(&[1,],);
-		let mut sol = Solution::remove_nth_from_end(ary_to_list(&[1, 2,],), 1,);
+		let mut sol = Solution::merge_two_lists(list1, list2,);
 		assert_eq!(ans, sol);
 	}
 }
