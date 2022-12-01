@@ -2,29 +2,22 @@
 
 struct Solution;
 impl Solution {
-	pub fn generate_parenthesis(n: i32,) -> Vec<String,> {
-		let mut hash = std::collections::HashSet::new();
+	pub fn generate_parenthesis(n: i32,) -> Vec<String,> { back_track("".to_string(), n, 0,) }
+}
 
-		if n == 1 {
-			vec![String::from("()",)]
-		} else {
-			let mut pre = Solution::generate_parenthesis(n - 1,);
-			for mut s in pre {
-				for i in 0..=s.len() {
-					let mut s = s.clone();
-					s.insert_str(i, "()",);
-					hash.insert(s,);
-				}
-			}
-
-			let mut ret = vec![];
-			for s in hash.iter() {
-				ret.push(s.clone(),);
-			}
-
-			ret
-		}
+fn back_track(s: String, open: i32, close: i32,) -> Vec<String,> {
+	if open == 0 && close == 0 {
+		return vec![s];
 	}
+
+	let mut ret = vec![];
+	if open > 0 {
+		ret.append(&mut back_track(s.clone() + "(", open - 1, close + 1,),);
+	}
+	if close > 0 {
+		ret.append(&mut back_track(s.clone() + ")", open, close - 1,),);
+	}
+	ret
 }
 
 fn main() {}
