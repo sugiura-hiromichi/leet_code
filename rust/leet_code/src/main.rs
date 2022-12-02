@@ -13,12 +13,27 @@ impl ListNode {
 struct Solution;
 impl Solution {
 	pub fn merge_k_lists(lists: Vec<Option<Box<ListNode,>,>,>,) -> Option<Box<ListNode,>,> {
-		let mut rslt = None;
-		for l in lists {
-			rslt = merge_two_lists(rslt, l,);
-		}
-		rslt
+		let mut v = lists.iter().flat_map(|opt| list_to_ary(opt.clone(),),).collect::<Vec<i32,>>();
+		v.sort();
+		ary_to_list(v,)
 	}
+}
+
+fn ary_to_list(ary: Vec<i32,>,) -> Option<Box<ListNode,>,> {
+	if ary.is_empty() {
+		None
+	} else {
+		Some(Box::new(ListNode { val: ary[0], next: ary_to_list(ary[1..].to_vec(),), },),)
+	}
+}
+
+fn list_to_ary(mut list: Option<Box<ListNode,>,>,) -> Vec<i32,> {
+	let mut ret = vec![];
+	while let Some(ref nod,) = list {
+		ret.push(nod.clone().val,);
+		list = list.unwrap().next;
+	}
+	ret
 }
 
 fn merge_two_lists(
