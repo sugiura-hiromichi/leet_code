@@ -28,10 +28,8 @@ fn merge_two_lists(
 	match (l1.clone(), l2.clone(),) {
 		(Some(mut one,), Some(mut two,),) => {
 			if one.val < two.val {
-				//l1.as_mut().unwrap().next = merge_two_lists(one.next, l2,);
 				Some(Box::new(ListNode { val: one.val, next: merge_two_lists(one.next, l2,), },),)
 			} else {
-				//l2.as_mut().unwrap().next = merge_two_lists(l1, two.next,);
 				Some(Box::new(ListNode { val: two.val, next: merge_two_lists(two.next, l1,), },),)
 			}
 		},
@@ -62,6 +60,13 @@ mod tests {
 	fn test_3() {
 		let mut ans = ary_to_list(&[],);
 		let mut sol = Solution::merge_k_lists(arys_to_lists(vec![&[]],),);
+		assert_eq!(ans, sol);
+	}
+
+	#[test]
+	fn test_4() {
+		let mut ans = ary_to_list(&[1, 2, 3,],);
+		let mut sol = Solution::merge_k_lists(arys_to_lists(vec![&[1,], &[2, 3,]],),);
 		assert_eq!(ans, sol);
 	}
 
