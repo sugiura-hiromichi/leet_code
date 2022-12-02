@@ -1,59 +1,86 @@
+#![allow(unused, dead_code)]
+#[derive(PartialEq, Eq, Clone, Debug,)]
+pub struct ListNode {
+	pub val:  i32,
+	pub next: Option<Box<ListNode,>,>,
+}
+
+impl ListNode {
+	#[inline]
+	fn new(val: i32,) -> Self { ListNode { next: None, val, } }
+}
+
 struct Solution;
 impl Solution {
-	pub fn three_sum(nums: Vec<i32,>,) -> Vec<Vec<i32,>,> {
-		let mut nlist = std::collections::HashMap::new();
-		let mut nums: Vec<i32,> = nums
-			.iter()
-			.filter_map(|&k| {
-				if let Some(v,) = nlist.insert(k, 1,) {
-					if v >= 3 {
-						return None;
-					}
-					nlist.insert(k, v + 1,);
-				}
-				Some(k,)
-			},)
-			.collect();
-		nums.sort();
-
-		// FIXME:
-		let mut veclist = std::collections::HashSet::new();
-		for i in 0..nums.len() - 2 {
-			for j in i + 1..nums.len() - 1 {
-				let k = -nums[i] - nums[j];
-				if k < 0 || nums[i] + nums[j] * 2 > 0 {
-					break;
-				}
-				if let Some(v,) = nlist.get(&k,) {
-					if k == nums[i] {
-						if k == nums[j] {
-							if *v > 2 {
-								veclist.insert(vec![nums[i], nums[j], k],);
-							}
-						} else if *v > 1 {
-							veclist.insert(vec![nums[i], nums[j], k],);
-						}
-					} else {
-						veclist.insert(vec![nums[i], nums[j], k],);
-					}
-				}
-			}
+	pub fn merge_k_lists(lists: Vec<Option<Box<ListNode,>,>,>,) -> Option<Box<ListNode,>,> {
+		let mut rslt = None;
+		for l in lists {
+			rslt = merge_two_lists(rslt, l,);
 		}
-
-		let mut vec = vec![];
-		for v in veclist {
-			vec.push(v,);
-		}
-
-		vec
+		rslt
 	}
 }
 
-fn main() {
-	println!("0----");
-	assert_eq!(Solution::three_sum(vec![-1, 0, 1, 2, -1, -4]), [[-1, -1, 2], [-1, 0, 1],]);
-	println!("1----");
-	assert_eq!(Solution::three_sum(vec![0, 0, 0]), [[0, 0, 0]]);
-	println!("2----");
-	assert_eq!(Solution::three_sum(vec![0, 0, 0, 0]), [[0, 0, 0]]);
+fn merge_two_lists(
+	l1: Option<Box<ListNode,>,>,
+	l2: Option<Box<ListNode,>,>,
+) -> Option<Box<ListNode,>,> {
+	match (l1.clone(), l2.clone(),) {
+		(Some(mut one,), Some(mut two,),) => {
+			if one.val < two.val {
+				Some(Box::new(ListNode { val: one.val, next: merge_two_lists(one.next, l2,), },),)
+			} else {
+				Some(Box::new(ListNode { val: two.val, next: merge_two_lists(two.next, l1,), },),)
+			}
+		},
+		(nxt, None,) | (None, nxt,) => nxt,
+	}
 }
+
+#[cfg(test)]
+mod tests {
+	use super::*;
+
+	#[test]
+	fn test_1() {
+		let mut ans = ary_to_list(&[1, 1, 2, 3, 4, 4, 5, 6,],);
+		let mut sol =
+			Solution::merge_k_lists(arys_to_lists(vec![&[1, 4, 5,], &[1, 3, 4,], &[2, 6,]],),);
+		assert_eq!(ans, sol);
+	}
+
+	#[test]
+	fn test_2() {
+		let mut ans = ary_to_list(&[],);
+		let mut sol = Solution::merge_k_lists(arys_to_lists(vec![],),);
+		assert_eq!(ans, sol);
+	}
+
+	#[test]
+	fn test_3() {
+		let mut ans = ary_to_list(&[],);
+		let mut sol = Solution::merge_k_lists(arys_to_lists(vec![&[]],),);
+		assert_eq!(ans, sol);
+	}
+
+	#[test]
+	fn test_4() {
+		let mut ans = ary_to_list(&[1, 2, 3,],);
+		let mut sol = Solution::merge_k_lists(arys_to_lists(vec![&[1,], &[2, 3,]],),);
+		assert_eq!(ans, sol);
+	}
+
+	fn ary_to_list(ary: &[i32],) -> Option<Box<ListNode,>,> {
+		if ary.is_empty() {
+			None
+		} else {
+			Some(Box::new(ListNode { val: ary[0], next: ary_to_list(&ary[1..],), },),)
+		}
+	}
+
+	fn arys_to_lists(arys: Vec<&[i32],>,) -> Vec<Option<Box<ListNode,>,>,> {
+		arys.iter().map(|&a| ary_to_list(a,),).collect()
+	}
+}
+
+fn main() {}
