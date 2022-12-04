@@ -1,4 +1,6 @@
 #![allow(unused, dead_code)]
+struct Solution;
+
 #[derive(PartialEq, Eq, Clone, Debug,)]
 pub struct ListNode {
 	pub val:  i32,
@@ -10,45 +12,36 @@ impl ListNode {
 	fn new(val: i32,) -> Self { ListNode { next: None, val, } }
 }
 
-struct Solution;
+impl PartialOrd for ListNode {
+	fn partial_cmp(&self, other: &Self,) -> Option<std::cmp::Ordering,> {
+		self.val.partial_cmp(&other.val,)
+	}
+}
+impl Ord for ListNode {
+	fn cmp(&self, other: &Self,) -> std::cmp::Ordering { self.val.cmp(&other.val,) }
+}
+
+use std::cmp::Reverse;
 impl Solution {
 	pub fn merge_k_lists(lists: Vec<Option<Box<ListNode,>,>,>,) -> Option<Box<ListNode,>,> {
-		let mut v = lists.iter().flat_map(|opt| list_to_ary(opt.clone(),),).collect::<Vec<i32,>>();
-		v.sort();
-		ary_to_list(v,)
-	}
-}
-
-fn ary_to_list(ary: Vec<i32,>,) -> Option<Box<ListNode,>,> {
-	if ary.is_empty() {
-		None
-	} else {
-		Some(Box::new(ListNode { val: ary[0], next: ary_to_list(ary[1..].to_vec(),), },),)
-	}
-}
-
-fn list_to_ary(mut list: Option<Box<ListNode,>,>,) -> Vec<i32,> {
-	let mut ret = vec![];
-	while let Some(ref nod,) = list {
-		ret.push(nod.clone().val,);
-		list = list.unwrap().next;
-	}
-	ret
-}
-
-fn merge_two_lists(
-	l1: Option<Box<ListNode,>,>,
-	l2: Option<Box<ListNode,>,>,
-) -> Option<Box<ListNode,>,> {
-	match (l1.clone(), l2.clone(),) {
-		(Some(mut one,), Some(mut two,),) => {
-			if one.val < two.val {
-				Some(Box::new(ListNode { val: one.val, next: merge_two_lists(one.next, l2,), },),)
-			} else {
-				Some(Box::new(ListNode { val: two.val, next: merge_two_lists(two.next, l1,), },),)
+		let mut min_heap = std::collections::BinaryHeap::new();
+		for l in lists {
+			if let Some(nod,) = l {
+				min_heap.push(Reverse(nod,),);
 			}
-		},
-		(nxt, None,) | (None, nxt,) => nxt,
+		}
+
+		let mut head = ListNode::new(0,);
+		let mut cur = &mut head;
+		while let Some(Reverse(nod,),) = min_heap.pop() {
+			cur.next = Some(Box::new(ListNode::new(nod.val,),),);
+			cur = cur.next.as_mut().unwrap();
+			if let Some(nxt,) = nod.next {
+				min_heap.push(Reverse(nxt,),);
+			}
+		}
+
+		head.next
 	}
 }
 
