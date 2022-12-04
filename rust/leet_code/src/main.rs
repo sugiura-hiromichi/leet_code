@@ -12,36 +12,17 @@ impl ListNode {
 	fn new(val: i32,) -> Self { ListNode { next: None, val, } }
 }
 
-impl PartialOrd for ListNode {
-	fn partial_cmp(&self, other: &Self,) -> Option<std::cmp::Ordering,> {
-		self.val.partial_cmp(&other.val,)
-	}
-}
-impl Ord for ListNode {
-	fn cmp(&self, other: &Self,) -> std::cmp::Ordering { self.val.cmp(&other.val,) }
-}
-
-use std::cmp::Reverse;
 impl Solution {
-	pub fn merge_k_lists(lists: Vec<Option<Box<ListNode,>,>,>,) -> Option<Box<ListNode,>,> {
-		let mut min_heap = std::collections::BinaryHeap::new();
-		for l in lists {
-			if let Some(nod,) = l {
-				min_heap.push(Reverse(nod,),);
-			}
-		}
-
-		let mut head = ListNode::new(0,);
-		let mut cur = &mut head;
-		while let Some(Reverse(nod,),) = min_heap.pop() {
-			cur.next = Some(Box::new(ListNode::new(nod.val,),),);
-			cur = cur.next.as_mut().unwrap();
-			if let Some(nxt,) = nod.next {
-				min_heap.push(Reverse(nxt,),);
-			}
-		}
-
-		head.next
+	pub fn merge_k_lists(mut lists: Vec<Option<Box<ListNode,>,>,>,) -> Option<Box<ListNode,>,> {
+		let i = lists
+			.iter()
+			.enumerate()
+			.min_by_key(|(_, x,)| x.as_ref().map_or(std::i32::MAX, |x| x.val,),)?
+			.0;
+		let mut head = lists[i].take()?;
+		lists[i] = head.next;
+		head.next = Self::merge_k_lists(lists,);
+		Some(head,)
 	}
 }
 
