@@ -15,8 +15,14 @@ impl ListNode {
 
 impl Solution {
 	pub fn remove_element(nums: &mut Vec<i32,>, val: i32,) -> i32 {
-		nums.retain(|&x| x != val,);
-		nums.len() as i32
+		let mut insert_index = 0;
+		for i in 0..nums.len() {
+			if nums[i] != val {
+				nums[insert_index] = nums[i];
+				insert_index += 1;
+			}
+		}
+		insert_index as i32
 	}
 }
 
