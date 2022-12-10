@@ -15,29 +15,23 @@ impl ListNode {
 
 impl Solution {
 	pub fn reverse_k_group(mut head: Option<Box<ListNode,>,>, k: i32,) -> Option<Box<ListNode,>,> {
-		let mut cur = head.clone();
-
-		// find k+1th node
-		let mut i = 0;
-		while cur != None && i != k {
-			cur = cur?.next;
-			i += 1;
-		}
-
-		if i == k {
-			// reverse rest k groups with k+1th node as head
-			cur = Solution::reverse_k_group(cur, k,);
-
-			// reverse current k group
-			for _ in 0..i {
-				let tmp = head.clone()?.next;
-				head.as_mut()?.next = cur; // create reversed k+1-ith node
-				cur = head.clone();
-				head = tmp;
+		let mut p = &mut head;
+		// detect k+1th node
+		for _ in 0..k {
+			if let Some(nod,) = p {
+				p = &mut nod.next;
+			} else {
+				return head;
 			}
-			head = cur;
 		}
-		head
+
+		let mut ret = Self::reverse_k_group(p.take(), k,);
+		while let Some(h,) = head.take() {
+			ret = Some(Box::new(ListNode { val: h.val, next: ret, },),);
+			head = h.next;
+		}
+
+		ret
 	}
 }
 
