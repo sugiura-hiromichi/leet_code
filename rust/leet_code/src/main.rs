@@ -14,8 +14,8 @@ impl ListNode {
 }
 
 impl Solution {
-	pub fn remove_duplicates(nums: &mut Vec<i32,>,) -> i32 {
-		nums.dedup();
+	pub fn remove_element(nums: &mut Vec<i32,>, val: i32,) -> i32 {
+		nums.retain(|&x| x != val,);
 		nums.len() as i32
 	}
 }
@@ -38,20 +38,20 @@ mod tests {
 
 	#[test]
 	fn test_1() {
-		let nums = &mut vec![1, 1, 2];
+		let nums = &mut vec![3, 2, 2, 3];
 		let mut ans = 2;
-		let mut sol = Solution::remove_duplicates(nums,);
+		let mut sol = Solution::remove_element(nums, 3,);
 		assert_eq!(ans, sol);
-		assert_eq!(nums, &[1, 2]);
+		assert_eq!(nums, &[2, 2]);
 	}
 
 	#[test]
 	fn test_2() {
-		let nums = &mut vec![0, 0, 1, 1, 1, 2, 2, 3, 3, 4];
+		let nums = &mut vec![0, 1, 2, 2, 3, 0, 4, 2];
 		let mut ans = 5;
-		let mut sol = Solution::remove_duplicates(nums,);
+		let mut sol = Solution::remove_element(nums, 2,);
 		assert_eq!(ans, sol);
-		assert_eq!(nums, &[0, 1, 2, 3, 4]);
+		assert_eq!(nums, &[0, 1, 3, 0, 4]);
 	}
 }
 
