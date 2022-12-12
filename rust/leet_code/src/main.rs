@@ -1,5 +1,4 @@
 #![allow(unused)]
-
 struct Solution;
 
 #[derive(PartialEq, Eq, Clone, Debug,)]
@@ -13,58 +12,111 @@ impl ListNode {
 	fn new(val: i32,) -> Self { ListNode { next: None, val, } }
 }
 
-trait AltAbs {
-	fn minus_abs(self,) -> Self;
-}
+impl Solution {
+	pub fn find_substring(s: String, mut words: Vec<String,>,) -> Vec<i32,> {
+		let mut ret = vec![];
+		// deal with edge cases
+		if words.is_empty() {
+			return ret;
+		}
 
-impl AltAbs for (i32, i32,) {
-	fn minus_abs(self,) -> Self {
-		let a = if self.0 > 0 { -self.0 } else { self.0 };
-		let b = if self.1 > 0 { -self.1 } else { self.1 };
-		(a, b,)
+		// prepare
+		words.sort();
+		let word_len = words[0].len();
+		let len = words.len() * word_len;
+
+		let mut word_list = words.clone();
+		word_list.dedup();
+		for word in word_list {
+			let mut pad = 0;
+
+			// find candidate's head
+			while let Some(i,) = s[pad..].find(&word,) {
+				let mut candidate = match s.get(i + pad..i + pad + len,) {
+					// iterator over each words
+					Some(cand,) => cand
+						.char_indices()
+						.filter_map(|(j, _,)| {
+							if (j + 1) % word_len == 0 {
+								Some(cand[j + 1 - word_len..=j].to_string(),)
+							} else {
+								None
+							}
+						},)
+						.collect::<Vec<String,>>(),
+					None => break,
+				};
+				candidate.sort();
+
+				if words == candidate {
+					ret.push((pad + i) as i32,);
+				}
+
+				// prepare for next loop
+				pad += i + 1;
+			}
+		}
+		ret
 	}
 }
 
-impl Solution {
-	pub fn divide(dividend: i32, divisor: i32,) -> i32 {
-		if divisor == -1 {
-			if dividend == i32::MIN {
-				return i32::MAX;
-			} else {
-				return -dividend;
-			}
-		} else if divisor == 1 {
-			return dividend;
-		}
-		if dividend == 0 {
-			return 0;
-		}
+#[cfg(test)]
+mod tests {
+	use super::*;
 
-		// d: dd & ds are minus
-		let (dd, ds,) = (dividend, divisor,).minus_abs();
-		let mut no_frac = dd;
+	#[test]
+	fn test_1() {
+		let mut ans = vec![0, 9];
+		let mut sol = Solution::find_substring(
+			"barfoothefoobarman".to_string(),
+			vec!["foo".to_string(), "bar".to_string()],
+		);
+		sol.sort();
+		assert_eq!(ans, sol);
+	}
 
-		// q: sub from dd and check if dd<0
-		let mut subs = vec![(ds, 1,)];
-		let mut tmp = (ds, 1,);
-		while !tmp.0.overflowing_add(tmp.0,).1 && no_frac < tmp.0 {
-			tmp = (tmp.0 + tmp.0, tmp.1 + tmp.1,);
-			subs.push(tmp,);
-		}
+	#[test]
+	fn test_2() {
+		let mut ans: Vec<i32,> = vec![];
+		let mut sol = Solution::find_substring(
+			"wordgoodgoodgoodbestword".to_string(),
+			vec!["word".to_string(), "good".to_string(), "best".to_string(), "word".to_string()],
+		);
+		sol.sort();
+		assert_eq!(ans, sol);
+	}
 
-		let mut quo = 0;
-		for (sub, qs,) in subs.iter().rev() {
-			while no_frac <= *sub {
-				no_frac -= sub;
-				quo += qs;
-			}
-		}
+	#[test]
+	fn test_3() {
+		let mut ans = vec![6, 9, 12];
+		let mut sol = Solution::find_substring(
+			"barfoofoobarthefoobarman".to_string(),
+			vec!["bar".to_string(), "foo".to_string(), "the".to_string()],
+		);
+		sol.sort();
+		assert_eq!(ans, sol);
+	}
 
-		if dividend > 0 && divisor > 0 || dividend < 0 && divisor < 0 {
-			quo
-		} else {
-			-quo
-		}
+	#[test]
+	fn test_4() {
+		let mut ans = vec![8];
+		let mut sol = Solution::find_substring(
+			"wordgoodgoodgoodbestword".to_string(),
+			vec!["word".to_string(), "good".to_string(), "best".to_string(), "good".to_string()],
+		);
+		sol.sort();
+		assert_eq!(ans, sol);
+	}
+
+	#[test]
+	fn test_5() {
+		let mut ans = vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+		let mut sol = Solution::find_substring(
+			"aaaaaaaaaaaaaa".to_string(),
+			vec!["aa".to_string(), "aa".to_string()],
+		);
+		sol.sort();
+		assert_eq!(ans, sol);
 	}
 }
 
@@ -78,53 +130,6 @@ fn ary_to_list(ary: &[i32],) -> Option<Box<ListNode,>,> {
 
 fn arys_to_lists(arys: Vec<&[i32],>,) -> Vec<Option<Box<ListNode,>,>,> {
 	arys.iter().map(|&a| ary_to_list(a,),).collect()
-}
-
-#[cfg(test)]
-mod tests {
-	use super::*;
-
-	#[test]
-	fn test_1() {
-		let mut ans = 3;
-		let mut sol = Solution::divide(10, 3,);
-		assert_eq!(ans, sol);
-	}
-
-	#[test]
-	fn test_2() {
-		let mut ans = -2;
-		let mut sol = Solution::divide(7, -3,);
-		assert_eq!(ans, sol);
-	}
-
-	#[test]
-	fn test_3() {
-		let mut ans = 2147483647;
-		let mut sol = Solution::divide(2147483647, 1,);
-		assert_eq!(ans, sol);
-	}
-
-	#[test]
-	fn test_4() {
-		let mut ans = 1073741823;
-		let mut sol = Solution::divide(2147483647, 2,);
-		assert_eq!(ans, sol);
-	}
-
-	#[test]
-	fn test_5() {
-		let mut ans = 1;
-		let mut sol = Solution::divide(2, 2,);
-		assert_eq!(ans, sol);
-	}
-
-	#[test]
-	fn test_6() {
-		let mut ans = -1073741824;
-		let mut sol = Solution::divide(-2147483648, 2,);
-		assert_eq!(ans, sol);
-	}
 }
 
 // use only when stdin is needed
