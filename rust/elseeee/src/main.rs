@@ -181,6 +181,13 @@ fn main() {
 		3
 	};
 	assert_eq!(rslt, 2);
+
+	///===============================================================
+	// `..=X` ranges in patterns enabled from 1.66.0
+	match 9 {
+		0..=3 => assert!(false),
+		_ => assert!(true),
+	}
 }
 
 struct HasPrivate {
