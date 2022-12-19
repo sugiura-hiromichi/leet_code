@@ -1,4 +1,5 @@
 #![allow(unused)]
+
 struct Solution;
 
 #[derive(PartialEq, Eq, Clone, Debug,)]
@@ -12,51 +13,69 @@ impl ListNode {
 	fn new(val: i32,) -> Self { ListNode { next: None, val, } }
 }
 
+use std::collections::hash_map::Entry;
+use std::collections::HashMap;
 impl Solution {
+	/// implement `find_substring` using `HashMap` and `hash_map::Entry`
 	pub fn find_substring(s: String, mut words: Vec<String,>,) -> Vec<i32,> {
-		let mut ret = vec![];
-		// deal with edge cases
+		let mut start_indices = Vec::<i32,>::new();
 		if words.is_empty() {
-			return ret;
+			return start_indices;
 		}
 
-		// prepare
-		words.sort();
-		let word_len = words[0].len();
-		let len = words.len() * word_len;
+		let word_size = words[0].len();
+		let len = word_size * words.len();
 
-		let mut word_list = words.clone();
-		word_list.dedup();
-		for word in word_list {
-			let mut pad = 0;
+		if let Some(sub_case,) = s.len().checked_sub(len,) {
+			// PERF: `::with_capacity()` is faster than `::new()`
+			let mut word_set = HashMap::with_capacity(words.len(),);
+			words.iter().for_each(|w| {
+				// q: What is `.entry()` method?
+				let count = word_set.entry(w.as_str(),).or_insert(0,);
+				*count += 1;
+			},);
 
-			// find candidate's head
-			while let Some(i,) = s[pad..].find(&word,) {
-				let mut candidate = match s.get(i + pad..i + pad + len,) {
-					// iterator over each words
-					Some(cand,) => cand
-						.char_indices()
-						.filter_map(|(j, _,)| {
-							if (j + 1) % word_len == 0 {
-								Some(cand[j + 1 - word_len..=j].to_string(),)
-							} else {
-								None
-							}
-						},)
-						.collect::<Vec<String,>>(),
-					None => break,
-				};
-				candidate.sort();
+			// subs constructed from `word_set`. this is required by `match` 13 lines below
+			let mut subs = word_set.keys().map(|k| (*k, 0,),).collect::<HashMap<_, _,>>();
+			// d: case like `s="aa"`, `words=["a","a"]` requires calling `.min()`
+			for i in 0..word_size.min(sub_case + 1,) {
+				// `i` stands for **initial**, `f` stands for **final**
+				let mut f = i + len;
+				while f <= s.len() {
+					let mut k = 1;
+					while k <= words.len() {
+						let cur_pos = f - k * word_size;
+						let cur = &s[cur_pos..cur_pos + word_size];
 
-				if words == candidate {
-					ret.push((pad + i) as i32,);
+						//whether `subs` has key `cur` q: Search about `Entry` enum
+						match subs.entry(cur,) {
+							Entry::Occupied(ent,) => {
+								let res = ent.into_mut();
+								*res += 1;
+								if *res > *word_set.get(cur,).unwrap() {
+									// in this case, substrings contains `cur` overly
+									break;
+								} else {
+									k += 1;
+								}
+							},
+							Entry::Vacant(_,) => break,
+						}
+					}
+
+					// adjust `f` and `subs`, and if substring found, push to start_indices.
+					let start = f - len;
+					if k > words.len() {
+						start_indices.push(start as i32,);
+						f += word_size;
+					} else {
+						f += len - (k - 1) * word_size;
+					}
+					subs.values_mut().for_each(|v| *v = 0,)
 				}
-
-				// prepare for next loop
-				pad += i + 1;
 			}
 		}
-		ret
+		start_indices
 	}
 }
 
