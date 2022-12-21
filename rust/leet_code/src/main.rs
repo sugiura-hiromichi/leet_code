@@ -13,70 +13,35 @@ impl ListNode {
 	fn new(val: i32,) -> Self { ListNode { next: None, val, } }
 }
 
-use std::collections::hash_map::Entry;
-use std::collections::HashMap;
 impl Solution {
-	/// implement `find_substring` using `HashMap` and `hash_map::Entry`
-	pub fn find_substring(s: String, mut words: Vec<String,>,) -> Vec<i32,> {
-		let mut start_indices = Vec::<i32,>::new();
-		if words.is_empty() {
-			return start_indices;
-		}
-
-		let word_size = words[0].len();
-		let len = word_size * words.len();
-
-		if let Some(sub_case,) = s.len().checked_sub(len,) {
-			// PERF: `::with_capacity()` is faster than `::new()`
-			let mut word_set = HashMap::with_capacity(words.len(),);
-			words.iter().for_each(|w| {
-				// q: What is `.entry()` method?
-				let count = word_set.entry(w.as_str(),).or_insert(0,);
-				*count += 1;
-			},);
-
-			// subs constructed from `word_set`. this is required by `match` 13 lines below
-			let mut subs = word_set.keys().map(|k| (*k, 0,),).collect::<HashMap<_, _,>>();
-			// d: case like `s="aa"`, `words=["a","a"]` requires calling `.min()`
-			for i in 0..word_size.min(sub_case + 1,) {
-				// `i` stands for **initial**, `f` stands for **final**
-				let mut f = i + len;
-				while f <= s.len() {
-					let mut k = 1;
-					while k <= words.len() {
-						let cur_pos = f - k * word_size;
-						let cur = &s[cur_pos..cur_pos + word_size];
-
-						//whether `subs` has key `cur` q: Search about `Entry` enum
-						match subs.entry(cur,) {
-							Entry::Occupied(ent,) => {
-								let res = ent.into_mut();
-								*res += 1;
-								if *res > *word_set.get(cur,).unwrap() {
-									// in this case, substrings contains `cur` overly
-									break;
-								} else {
-									k += 1;
-								}
-							},
-							Entry::Vacant(_,) => break,
-						}
-					}
-
-					// adjust `f` and `subs`, and if substring found, push to start_indices.
-					let start = f - len;
-					if k > words.len() {
-						start_indices.push(start as i32,);
-						f += word_size;
-					} else {
-						f += len - (k - 1) * word_size;
-					}
-					subs.values_mut().for_each(|v| *v = 0,)
-				}
+	pub fn next_permutation(nums: &mut Vec<i32,>,) {
+		for i in (1..nums.len()).rev() {
+			if nums[i - 1] < nums[i] {
+				let swap_pos = i + lexcal_nxt(nums[i..].to_vec(), nums[i - 1],);
+				nums.swap(i - 1, swap_pos,);
+				nums.get_mut(i..,).unwrap().sort();
+				return;
 			}
 		}
-		start_indices
+		nums.sort();
 	}
+}
+
+///# NOTE:
+///  `lexcal_nxt` returns position of lexicographically next value
+fn lexcal_nxt(v: Vec<i32,>, target: i32,) -> usize {
+	/* more general algorhythm
+	 let mut ret = (0, i32::MAX,);
+	 v.iter().enumerate().for_each(|(pos, &i,)| {
+		 if target < i && i < ret.1 {
+			 ret = (pos, i,)
+		 }
+	 },);
+
+	 ret.0
+	*/
+	// this assumes v is sorted reversely. use less memory
+	v.iter().enumerate().filter(|&(pos, &i,)| i > target,).last().unwrap().0
 }
 
 #[cfg(test)]
@@ -85,56 +50,41 @@ mod tests {
 
 	#[test]
 	fn test_1() {
-		let mut ans = vec![0, 9];
-		let mut sol = Solution::find_substring(
-			"barfoothefoobarman".to_string(),
-			vec!["foo".to_string(), "bar".to_string()],
-		);
-		sol.sort();
+		let mut ans = vec![1, 3, 2];
+		let mut sol = vec![1, 2, 3];
+		Solution::next_permutation(&mut sol,);
 		assert_eq!(ans, sol);
 	}
 
 	#[test]
 	fn test_2() {
-		let mut ans: Vec<i32,> = vec![];
-		let mut sol = Solution::find_substring(
-			"wordgoodgoodgoodbestword".to_string(),
-			vec!["word".to_string(), "good".to_string(), "best".to_string(), "word".to_string()],
-		);
-		sol.sort();
+		let mut ans = vec![1, 2, 3];
+		let mut sol = vec![3, 2, 1];
+		Solution::next_permutation(&mut sol,);
 		assert_eq!(ans, sol);
 	}
 
 	#[test]
 	fn test_3() {
-		let mut ans = vec![6, 9, 12];
-		let mut sol = Solution::find_substring(
-			"barfoofoobarthefoobarman".to_string(),
-			vec!["bar".to_string(), "foo".to_string(), "the".to_string()],
-		);
-		sol.sort();
+		let mut ans = vec![1, 5, 1];
+		let mut sol = vec![1, 1, 5];
+		Solution::next_permutation(&mut sol,);
 		assert_eq!(ans, sol);
 	}
 
 	#[test]
 	fn test_4() {
-		let mut ans = vec![8];
-		let mut sol = Solution::find_substring(
-			"wordgoodgoodgoodbestword".to_string(),
-			vec!["word".to_string(), "good".to_string(), "best".to_string(), "good".to_string()],
-		);
-		sol.sort();
+		let mut ans = vec![2, 1, 3];
+		let mut sol = vec![1, 3, 2];
+		Solution::next_permutation(&mut sol,);
 		assert_eq!(ans, sol);
 	}
 
 	#[test]
 	fn test_5() {
-		let mut ans = vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-		let mut sol = Solution::find_substring(
-			"aaaaaaaaaaaaaa".to_string(),
-			vec!["aa".to_string(), "aa".to_string()],
-		);
-		sol.sort();
+		let mut ans = vec![3, 1, 2];
+		let mut sol = vec![2, 3, 1];
+		Solution::next_permutation(&mut sol,);
 		assert_eq!(ans, sol);
 	}
 }
