@@ -49,14 +49,19 @@ mod commented_module {
 /// # Safety
 fn main() {
 	//This is normal Comment
+	// FIX:
+	// e:
 	// TODO:
-	// IDEA: idea
-	// FIX: fix
-	// XXX: -> todo or fixme
-	// NOTE: -> Emphasizing
-	// INFO:
-	// HACK:  these are specially highlighted by vim
-	// CASE:
-	// OPT: optimize
+	// q:
+	// HACK:
+	// a:
+	// WARN:
+	// x:
+	// PERF:
+	// p:
+	// NOTE:
+	// d:
+	// TEST:
+	// t:
 	println!("Hello, world!");
 }
