@@ -6,29 +6,18 @@ impl Solution {
 		if s.len() <= 1 {
 			return 0;
 		}
-
-		// longest[i] means the longest length of valid parentheses which is end at i.
 		let mut longest = vec![0; s.len()];
 
-		// *DP idea is*:
 		for i in 1..s.len() {
-			if &s[i..=i] == ")" {
-				// if s[i-1] is '(', longest[i]=longest[i-2]+2
-				if &s[i - 1..i] == "(" {
-					longest[i] = if i > 1 { longest[i - 2] + 2 } else { 2 };
-				} else {
-					// **and s[i-longest[i-1]-1]=='('**, longest[i]=longest[i-1]+2+longest[i-longest[i-1]-2]
-					if i - longest[i - 1] > 0
-						&& &s[i - longest[i - 1] - 1..i - longest[i - 1]] == "("
-					{
-						longest[i] = longest[i - 1] + 2;
-						if i - longest[i - 1] > 1 {
-							longest[i] += longest[i - longest[i - 1] - 2];
-						}
-					}
+			if &s[i..=i] == ")"
+				&& i - longest[i - 1] > 0
+				&& &s[i - longest[i - 1] - 1..i - longest[i - 1]] == "("
+			{
+				longest[i] = longest[i - 1] + 2;
+				if i - longest[i - 1] > 1 {
+					longest[i] += longest[i - longest[i - 1] - 2];
 				}
 			}
-			// if s[i] is '(', keep longest[i] be 0, because any string end with '(' can't be a valid one.
 		}
 
 		*longest.iter().max().unwrap() as i32
