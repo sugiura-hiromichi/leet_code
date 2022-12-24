@@ -63,5 +63,4 @@ fn main() {
 	// d:
 	// TEST:
 	// t:
-	println!("Hello, world!");
 }
