@@ -2,25 +2,11 @@
 
 struct Solution;
 impl Solution {
-	pub fn longest_valid_parentheses(s: String,) -> i32 {
-		if s.len() <= 1 {
-			return 0;
+	pub fn search(nums: Vec<i32,>, target: i32,) -> i32 {
+		match nums.iter().enumerate().find(|&(i, &n,)| n == target,) {
+			Some(i,) => i.0 as i32,
+			None => -1,
 		}
-		let mut longest = vec![0; s.len()];
-
-		for i in 1..s.len() {
-			if &s[i..=i] == ")"
-				&& i - longest[i - 1] > 0
-				&& &s[i - longest[i - 1] - 1..i - longest[i - 1]] == "("
-			{
-				longest[i] = longest[i - 1] + 2;
-				if i - longest[i - 1] > 1 {
-					longest[i] += longest[i - longest[i - 1] - 2];
-				}
-			}
-		}
-
-		*longest.iter().max().unwrap() as i32
 	}
 }
 
@@ -28,34 +14,24 @@ impl Solution {
 mod tests {
 	use super::*;
 
-	// FAIL: `sol=4`
 	#[test]
 	fn test_1() {
-		let mut ans = 6;
-		let mut sol = Solution::longest_valid_parentheses("()((())()".to_string(),);
+		let mut ans = 4;
+		let mut sol = Solution::search(vec![4, 5, 6, 7, 0, 1, 2], 0,);
 		assert_eq!(ans, sol);
 	}
 
-	// FAIL: `sol=2`
 	#[test]
 	fn test_2() {
-		let mut ans = 4;
-		let mut sol = Solution::longest_valid_parentheses(")(()((((())".to_string(),);
+		let mut ans = -1;
+		let mut sol = Solution::search(vec![4, 5, 6, 7, 0, 1, 2], 3,);
 		assert_eq!(ans, sol);
 	}
 
 	#[test]
 	fn test_3() {
-		let mut ans = 4;
-		let mut sol = Solution::longest_valid_parentheses(")()())()()(".to_string(),);
-		assert_eq!(ans, sol);
-	}
-
-	// FAIL: `sol=2`
-	#[test]
-	fn test_4() {
-		let mut ans = 4;
-		let mut sol = Solution::longest_valid_parentheses("(())".to_string(),);
+		let mut ans = -1;
+		let mut sol = Solution::search(vec![1], 0,);
 		assert_eq!(ans, sol);
 	}
 }
