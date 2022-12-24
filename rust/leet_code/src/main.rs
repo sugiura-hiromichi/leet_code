@@ -3,9 +3,21 @@
 struct Solution;
 impl Solution {
 	pub fn search(nums: Vec<i32,>, target: i32,) -> i32 {
-		match nums.iter().enumerate().find(|&(i, &n,)| n == target,) {
-			Some(i,) => i.0 as i32,
-			None => -1,
+		let (mut l, mut r,) = (0, nums.len() - 1,);
+
+		while l < r {
+			let mid = (l + r) / 2;
+			if (nums[mid] < nums[0]) ^ (target < nums[0]) ^ (nums[mid] < target) {
+				l = 1 + mid;
+			} else {
+				r = mid;
+			};
+		}
+
+		if nums[l] == target {
+			l as i32
+		} else {
+			-1
 		}
 	}
 }
