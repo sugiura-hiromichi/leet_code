@@ -2,11 +2,19 @@
 
 struct Solution;
 impl Solution {
-	pub fn search(nums: Vec<i32,>, target: i32,) -> i32 {
+	pub fn search_range(nums: Vec<i32,>, target: i32,) -> Vec<i32,> {
+		if nums.len() == 0 {
+			return vec![-1, -1];
+		}
 		let (mut l, mut r,) = (0, nums.len() - 1,);
 
 		while l < r {
 			let mid = (l + r) / 2;
+			if nums[mid] == target {
+				r = mid;
+				break;
+			}
+
 			if (nums[mid] < nums[0]) ^ (target < nums[0]) ^ (nums[mid] < target) {
 				l = 1 + mid;
 			} else {
@@ -14,11 +22,19 @@ impl Solution {
 			};
 		}
 
-		if nums[l] == target {
-			l as i32
-		} else {
-			-1
+		if nums[r] != target {
+			return vec![-1, -1];
 		}
+
+		l = r;
+		while l > 0 && nums[l - 1] == target {
+			l -= 1;
+		}
+		while r < nums.len() - 1 && nums[r + 1] == target {
+			r += 1;
+		}
+
+		vec![l as i32, r as i32]
 	}
 }
 
@@ -28,22 +44,22 @@ mod tests {
 
 	#[test]
 	fn test_1() {
-		let mut ans = 4;
-		let mut sol = Solution::search(vec![4, 5, 6, 7, 0, 1, 2], 0,);
+		let mut ans = vec![3, 4];
+		let mut sol = Solution::search_range(vec![5, 7, 7, 8, 8, 10], 8,);
 		assert_eq!(ans, sol);
 	}
 
 	#[test]
 	fn test_2() {
-		let mut ans = -1;
-		let mut sol = Solution::search(vec![4, 5, 6, 7, 0, 1, 2], 3,);
+		let mut ans = vec![-1, -1];
+		let mut sol = Solution::search_range(vec![5, 7, 7, 8, 8, 10], 6,);
 		assert_eq!(ans, sol);
 	}
 
 	#[test]
 	fn test_3() {
-		let mut ans = -1;
-		let mut sol = Solution::search(vec![1], 0,);
+		let mut ans = vec![-1, -1];
+		let mut sol = Solution::search_range(vec![], 0,);
 		assert_eq!(ans, sol);
 	}
 }
