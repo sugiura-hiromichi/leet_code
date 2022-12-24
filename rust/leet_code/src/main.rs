@@ -3,36 +3,35 @@
 struct Solution;
 impl Solution {
 	pub fn longest_valid_parentheses(s: String,) -> i32 {
-		let mut ret = 0;
-		let mut head = 0;
-
-		while let Some(i,) = s[head..].find('(',) {
-			let mut valid = 0;
-			let mut longest = 0;
-			for (j, c,) in s[head + i..].chars().enumerate() {
-				if c == '(' {
-					valid += 1;
-				} else {
-					if 0 == valid {
-						break;
-					}
-					valid -= 1;
-				}
-
-				if 0 == valid {
-					longest = longest.max(j + 1,);
-				}
-			}
-
-			ret = ret.max(longest,);
-			if head + i + longest + 1 < s.len() {
-				head += i + longest + 1;
-			} else {
-				break;
-			}
+		if s.len() <= 1 {
+			return 0;
 		}
 
-		ret as i32
+		// longest[i] means the longest length of valid parentheses which is end at i.
+		let mut longest = vec![0; s.len()];
+
+		// *DP idea is*:
+		for i in 1..s.len() {
+			if &s[i..=i] == ")" {
+				// if s[i-1] is '(', longest[i]=longest[i-2]+2
+				if &s[i - 1..i] == "(" {
+					longest[i] = if i > 1 { longest[i - 2] + 2 } else { 2 };
+				} else {
+					// **and s[i-longest[i-1]-1]=='('**, longest[i]=longest[i-1]+2+longest[i-longest[i-1]-2]
+					if i - longest[i - 1] > 0
+						&& &s[i - longest[i - 1] - 1..i - longest[i - 1]] == "("
+					{
+						longest[i] = longest[i - 1] + 2;
+						if i - longest[i - 1] > 1 {
+							longest[i] += longest[i - longest[i - 1] - 2];
+						}
+					}
+				}
+			}
+			// if s[i] is '(', keep longest[i] be 0, because any string end with '(' can't be a valid one.
+		}
+
+		*longest.iter().max().unwrap() as i32
 	}
 }
 
@@ -40,18 +39,11 @@ impl Solution {
 mod tests {
 	use super::*;
 
-	// FAIL: `sol=2`
+	// FAIL: `sol=4`
 	#[test]
 	fn test_1() {
 		let mut ans = 6;
 		let mut sol = Solution::longest_valid_parentheses("()((())()".to_string(),);
-		assert_eq!(ans, sol);
-	}
-
-	#[test]
-	fn test_4() {
-		let mut ans = 4;
-		let mut sol = Solution::longest_valid_parentheses("(())".to_string(),);
 		assert_eq!(ans, sol);
 	}
 
@@ -67,6 +59,14 @@ mod tests {
 	fn test_3() {
 		let mut ans = 4;
 		let mut sol = Solution::longest_valid_parentheses(")()())()()(".to_string(),);
+		assert_eq!(ans, sol);
+	}
+
+	// FAIL: `sol=2`
+	#[test]
+	fn test_4() {
+		let mut ans = 4;
+		let mut sol = Solution::longest_valid_parentheses("(())".to_string(),);
 		assert_eq!(ans, sol);
 	}
 }
