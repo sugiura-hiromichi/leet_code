@@ -4,17 +4,31 @@ struct Solution;
 impl Solution {
 	// d: It's time to study bit-manipulation
 	pub fn is_valid_sudoku(board: Vec<Vec<char,>,>,) -> bool {
-		let mut seen = std::collections::HashSet::new();
+		let mut yoko: [u16; 9] = [0; 9];
+		let mut tate: [u16; 9] = [0; 9];
+		let mut block: [u16; 9] = [0; 9];
+
 		for i in 0..9 {
 			for j in 0..9 {
-				let number = board[i][j];
-				if number != '.' {
-					if !seen.insert(format!("{number} in row {i}"),)
-						|| !seen.insert(format!("{number} in column {j}"),)
-						|| !seen.insert(format!("{number} in block {} - {}", i / 3, j / 3),)
-					{
-						return false;
-					}
+				match board[i][j] {
+					'.' => continue,
+					c => {
+						let k = (i / 3) * 3 + j / 3;
+						// d: `<<` is bit manipulation. `1 << b` means set bth bit.
+						// in 2 based, `1 << 4 == 10000`
+						let cur = 1 << c.to_digit(10,).unwrap();
+
+						// d: `bitand` for number behave like bit operator. ie, `5 & 2 == 0` because
+						// 5 is represented 101 in 2 based, 2 is represented 10 in 2 based. so `101
+						// & 10 ==0`.
+						if yoko[i] & cur != 0 || tate[j] & cur != 0 || block[k] & cur != 0 {
+							return false;
+						}
+
+						yoko[i] |= cur;
+						tate[j] |= cur;
+						block[k] |= cur;
+					},
 				}
 			}
 		}
