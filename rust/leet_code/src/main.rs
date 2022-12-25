@@ -2,37 +2,24 @@
 
 struct Solution;
 impl Solution {
+	// d: It's time to study bit-manipulation
 	pub fn is_valid_sudoku(board: Vec<Vec<char,>,>,) -> bool {
-		for yoko in 0..3 {
-			for tate in 0..3 {
-				if !valid(&board[yoko * 3 + tate],) {
-					return false;
-				}
-
-				let mut min_block = vec![];
-				let mut tate_block = vec![];
-				for i in 0..3 {
-					for j in 0..3 {
-						tate_block.push(board[i * 3 + j][yoko * 3 + tate],);
-						min_block.push(board[i + yoko * 3][j + tate * 3],);
+		let mut seen = std::collections::HashSet::new();
+		for i in 0..9 {
+			for j in 0..9 {
+				let number = board[i][j];
+				if number != '.' {
+					if !seen.insert(format!("{number} in row {i}"),)
+						|| !seen.insert(format!("{number} in column {j}"),)
+						|| !seen.insert(format!("{number} in block {} - {}", i / 3, j / 3),)
+					{
+						return false;
 					}
-				}
-
-				if !(valid(&tate_block,) && valid(&min_block,)) {
-					return false;
 				}
 			}
 		}
 		true
 	}
-}
-
-fn valid(block: &Vec<char,>,) -> bool {
-	let mut filtered: Vec<&char,> = block.iter().filter(|&&c| c != '.',).collect();
-	let len = filtered.len();
-	filtered.sort();
-	filtered.dedup();
-	filtered.len() == len
 }
 
 #[cfg(test)]
@@ -133,4 +120,5 @@ fn main() {
 	// t: `t` stands for "test"
 	// PASS:
 	// FAIL:
+	println!("2 is {} as u8", '2' as u8);
 }
