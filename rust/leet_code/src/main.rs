@@ -3,38 +3,31 @@
 struct Solution;
 impl Solution {
 	pub fn search_range(nums: Vec<i32,>, target: i32,) -> Vec<i32,> {
-		if nums.len() == 0 {
-			return vec![-1, -1];
-		}
-		let (mut l, mut r,) = (0, nums.len() - 1,);
+		let i = nums
+			.binary_search_by(|n| {
+				if n < &target {
+					std::cmp::Ordering::Less
+				} else {
+					std::cmp::Ordering::Greater
+				}
+			},)
+			.unwrap_err();
 
-		while l < r {
-			let mid = (l + r) / 2;
-			if nums[mid] == target {
-				r = mid;
-				break;
-			}
-
-			if (nums[mid] < nums[0]) ^ (target < nums[0]) ^ (nums[mid] < target) {
-				l = 1 + mid;
-			} else {
-				r = mid;
-			};
-		}
-
-		if nums[r] != target {
+		if i == nums.len() || nums[i] != target {
 			return vec![-1, -1];
 		}
 
-		l = r;
-		while l > 0 && nums[l - 1] == target {
-			l -= 1;
-		}
-		while r < nums.len() - 1 && nums[r + 1] == target {
-			r += 1;
-		}
+		let j = nums
+			.binary_search_by(|n| {
+				if n <= &target {
+					std::cmp::Ordering::Less
+				} else {
+					std::cmp::Ordering::Greater
+				}
+			},)
+			.unwrap_err();
 
-		vec![l as i32, r as i32]
+		vec![i as i32, (j - 1) as i32]
 	}
 }
 
