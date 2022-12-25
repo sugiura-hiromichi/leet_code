@@ -2,14 +2,8 @@
 
 struct Solution;
 impl Solution {
-	pub fn search_range(nums: Vec<i32,>, target: i32,) -> Vec<i32,> {
-		let i = nums.partition_point(|n| n < &target,);
-		if i == nums.len() || nums[i] != target {
-			return vec![-1, -1];
-		}
-
-		let j = nums.partition_point(|n| n <= &target,);
-		vec![i as i32, j as i32 - 1]
+	pub fn search_insert(nums: Vec<i32,>, target: i32,) -> i32 {
+		nums.partition_point(|n| n < &target,) as i32
 	}
 }
 
@@ -19,22 +13,22 @@ mod tests {
 
 	#[test]
 	fn test_1() {
-		let mut ans = vec![3, 4];
-		let mut sol = Solution::search_range(vec![5, 7, 7, 8, 8, 10], 8,);
+		let mut ans = 2;
+		let mut sol = Solution::search_insert(vec![1, 3, 5, 6], 5,);
 		assert_eq!(ans, sol);
 	}
 
 	#[test]
 	fn test_2() {
-		let mut ans = vec![-1, -1];
-		let mut sol = Solution::search_range(vec![5, 7, 7, 8, 8, 10], 6,);
+		let mut ans = 1;
+		let mut sol = Solution::search_insert(vec![1, 3, 5, 6], 2,);
 		assert_eq!(ans, sol);
 	}
 
 	#[test]
 	fn test_3() {
-		let mut ans = vec![-1, -1];
-		let mut sol = Solution::search_range(vec![], 0,);
+		let mut ans = 4;
+		let mut sol = Solution::search_insert(vec![1, 3, 5, 6], 7,);
 		assert_eq!(ans, sol);
 	}
 }
