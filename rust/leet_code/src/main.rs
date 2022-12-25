@@ -2,9 +2,37 @@
 
 struct Solution;
 impl Solution {
-	pub fn search_insert(nums: Vec<i32,>, target: i32,) -> i32 {
-		nums.partition_point(|n| n < &target,) as i32
+	pub fn is_valid_sudoku(board: Vec<Vec<char,>,>,) -> bool {
+		for yoko in 0..3 {
+			for tate in 0..3 {
+				if !valid(&board[yoko * 3 + tate],) {
+					return false;
+				}
+
+				let mut min_block = vec![];
+				let mut tate_block = vec![];
+				for i in 0..3 {
+					for j in 0..3 {
+						tate_block.push(board[i * 3 + j][yoko * 3 + tate],);
+						min_block.push(board[i + yoko * 3][j + tate * 3],);
+					}
+				}
+
+				if !(valid(&tate_block,) && valid(&min_block,)) {
+					return false;
+				}
+			}
+		}
+		true
 	}
+}
+
+fn valid(block: &Vec<char,>,) -> bool {
+	let mut filtered: Vec<&char,> = block.iter().filter(|&&c| c != '.',).collect();
+	let len = filtered.len();
+	filtered.sort();
+	filtered.dedup();
+	filtered.len() == len
 }
 
 #[cfg(test)]
@@ -13,22 +41,52 @@ mod tests {
 
 	#[test]
 	fn test_1() {
-		let mut ans = 2;
-		let mut sol = Solution::search_insert(vec![1, 3, 5, 6], 5,);
+		let mut ans = true;
+		let mut sol = Solution::is_valid_sudoku(vec![
+			vec!['5', '3', '.', '.', '7', '.', '.', '.', '.'],
+			vec!['6', '.', '.', '1', '9', '5', '.', '.', '.'],
+			vec!['.', '9', '8', '.', '.', '.', '.', '6', '.'],
+			vec!['8', '.', '.', '.', '6', '.', '.', '.', '3'],
+			vec!['4', '.', '.', '8', '.', '3', '.', '.', '1'],
+			vec!['7', '.', '.', '.', '2', '.', '.', '.', '6'],
+			vec!['.', '6', '.', '.', '.', '.', '2', '8', '.'],
+			vec!['.', '.', '.', '4', '1', '9', '.', '.', '5'],
+			vec!['.', '.', '.', '.', '8', '.', '.', '7', '9'],
+		],);
 		assert_eq!(ans, sol);
 	}
 
 	#[test]
 	fn test_2() {
-		let mut ans = 1;
-		let mut sol = Solution::search_insert(vec![1, 3, 5, 6], 2,);
+		let mut ans = false;
+		let mut sol = Solution::is_valid_sudoku(vec![
+			vec!['8', '3', '.', '.', '7', '.', '.', '.', '.'],
+			vec!['6', '.', '.', '1', '9', '5', '.', '.', '.'],
+			vec!['.', '9', '8', '.', '.', '.', '.', '6', '.'],
+			vec!['8', '.', '.', '.', '6', '.', '.', '.', '3'],
+			vec!['4', '.', '.', '8', '.', '3', '.', '.', '1'],
+			vec!['7', '.', '.', '.', '2', '.', '.', '.', '6'],
+			vec!['.', '6', '.', '.', '.', '.', '2', '8', '.'],
+			vec!['.', '.', '.', '4', '1', '9', '.', '.', '5'],
+			vec!['.', '.', '.', '.', '8', '.', '.', '7', '9'],
+		],);
 		assert_eq!(ans, sol);
 	}
 
 	#[test]
 	fn test_3() {
-		let mut ans = 4;
-		let mut sol = Solution::search_insert(vec![1, 3, 5, 6], 7,);
+		let mut ans = false;
+		let mut sol = Solution::is_valid_sudoku(vec![
+			vec!['.', '.', '4', '.', '.', '.', '6', '3', '.'],
+			vec!['.', '.', '.', '.', '.', '.', '.', '.', '.'],
+			vec!['5', '.', '.', '.', '.', '.', '.', '9', '.'],
+			vec!['.', '.', '.', '5', '6', '.', '.', '.', '.'],
+			vec!['4', '.', '3', '.', '.', '.', '.', '.', '1'],
+			vec!['.', '.', '.', '7', '.', '.', '.', '.', '.'],
+			vec!['.', '.', '.', '5', '.', '.', '.', '.', '.'],
+			vec!['.', '.', '.', '.', '.', '.', '.', '.', '.'],
+			vec!['.', '.', '.', '.', '.', '.', '.', '.', '.'],
+		],);
 		assert_eq!(ans, sol);
 	}
 }
