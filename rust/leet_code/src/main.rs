@@ -2,48 +2,133 @@
 
 struct Solution;
 impl Solution {
-	// d: It's time to study bit-manipulation
-	pub fn is_valid_sudoku(board: Vec<Vec<char,>,>,) -> bool {
-		let mut yoko: [u16; 9] = [0; 9];
-		let mut tate: [u16; 9] = [0; 9];
-		let mut block: [u16; 9] = [0; 9];
+	pub fn solve_sudoku(board: &mut Vec<Vec<char,>,>,) -> bool {
+		// NOTE: refactor to use bit manipulation later
+		while let Some(t,) = has_dot(board,) {
+			let mut validated = self_valid(t, board,);
+			if validated == 0 {
+				return false;
+			}
 
-		for i in 0..9 {
-			for j in 0..9 {
-				match board[i][j] {
-					'.' => continue,
-					c => {
-						let k = (i / 3) * 3 + j / 3;
-						// d: `<<` is bit manipulation. `1 << b` means set bth bit.
-						// in 2 based, `1 << 4 == 10000`
-						let cur = 1 << c.to_digit(10,).unwrap();
-
-						// d: `bitand` for number behave like bit operator. ie, `5 & 2 == 0` because
-						// 5 is represented 101 in 2 based, 2 is represented 10 in 2 based. so `101
-						// & 10 ==0`.
-						if yoko[i] & cur != 0 || tate[j] & cur != 0 || block[k] & cur != 0 {
-							return false;
-						}
-
-						yoko[i] |= cur;
-						tate[j] |= cur;
-						block[k] |= cur;
-					},
+			let mut th = 0;
+			while validated != 0 {
+				th += 1;
+				validated = validated >> 1;
+				if validated & 1 == 1 {
+					board[t.0][t.1] = char::from_digit(th, 10,).unwrap();
+					let mut b_clone = board.clone();
+					if Self::solve_sudoku(&mut b_clone,) {
+						*board = b_clone;
+						return true;
+					}
 				}
 			}
+			// d: if program reach here, all valid number were invalid
+			return false;
 		}
 		true
 	}
+}
+
+/// returns `(yoko, tate)`
+fn has_dot(board: &Vec<Vec<char,>,>,) -> Option<(usize, usize,),> {
+	for i in 0..9 {
+		for j in 0..9 {
+			if board[i][j] == '.' {
+				return Some((i, j,),);
+			}
+		}
+	}
+	None
+}
+
+/// returns `[yoko_flag, tate_flag, block_flag]`
+fn list_up_valid(t: (usize, usize,), board: &Vec<Vec<char,>,>,) -> u16 {
+	!(self_valid(t, board,) & other_invalid(t, board,))
+}
+
+/// returns valid flag to the position of `t`
+/// a: take care that flag is set **1~9th**. **NOT 0~8th!**.
+fn self_valid(t: (usize, usize,), board: &Vec<Vec<char,>,>,) -> u16 {
+	yoko_valid(t, board,) | tate_valid(t, board,) | block_valid(t, board,)
+}
+
+/// returns invalid flag to other rows & otehr columns
+fn other_invalid(t: (usize, usize,), board: &Vec<Vec<char,>,>,) -> u16 {
+	// first, set other rows validity
+	// & set other columns validity
+	let mut yoko = 0b1111111110u16;
+	let mut tate = 0b1111111110u16;
+	for i in 0..3 {
+		// unset all flag to valid one
+		if i != t.0 % 3 {
+			yoko &= !yoko_valid((t.0 / 3 * 3 + 1, t.1,), board,);
+		}
+		if i != t.1 % 3 {
+			tate &= !tate_valid((t.0, t.1 / 3 * 3 + 1,), board,);
+		}
+	}
+	// now, `yoko` represents invalid list of other rows
+	// & `tate` represents invalid list of other columns
+
+	tate | yoko
+}
+
+fn yoko_valid(t: (usize, usize,), board: &Vec<Vec<char,>,>,) -> u16 {
+	let mut is_valid = 0u16;
+	for i in 0..3 {
+		for j in 0..3 {
+			if let Some(c,) = board[t.0][i * 3 + j].to_digit(10,) {
+				is_valid |= 1 << c;
+			}
+		}
+	}
+	is_valid
+}
+
+fn tate_valid(t: (usize, usize,), board: &Vec<Vec<char,>,>,) -> u16 {
+	let mut is_valid = 0u16;
+	for i in 0..3 {
+		for j in 0..3 {
+			if let Some(c,) = board[i * 3 + j][t.1].to_digit(10,) {
+				is_valid |= 1 << c;
+			}
+		}
+	}
+	is_valid
+}
+
+fn block_valid(t: (usize, usize,), board: &Vec<Vec<char,>,>,) -> u16 {
+	let mut is_valid = 0u16;
+	for i in 0..3 {
+		for j in 0..3 {
+			if let Some(c,) = board[t.0 / 3 * 3 + i][t.1 / 3 * 3 + j].to_digit(10,) {
+				is_valid |= 1 << c;
+			}
+		}
+	}
+	is_valid
 }
 
 #[cfg(test)]
 mod tests {
 	use super::*;
 
+	#[ignore]
 	#[test]
 	fn test_1() {
-		let mut ans = true;
-		let mut sol = Solution::is_valid_sudoku(vec![
+		let mut ans = vec![
+			vec!['5', '3', '4', '6', '7', '8', '9', '1', '2'],
+			vec!['6', '7', '2', '1', '9', '5', '3', '4', '8'],
+			vec!['1', '9', '8', '3', '4', '2', '5', '6', '7'],
+			vec!['8', '5', '9', '7', '6', '1', '4', '2', '3'],
+			vec!['4', '2', '6', '8', '5', '3', '7', '9', '1'],
+			vec!['7', '1', '3', '9', '2', '4', '8', '5', '6'],
+			vec!['9', '6', '1', '5', '3', '7', '2', '8', '4'],
+			vec!['2', '8', '7', '4', '1', '9', '6', '3', '5'],
+			vec!['3', '4', '5', '2', '8', '6', '1', '7', '9'],
+		];
+		let mut sol = vec![
 			vec!['5', '3', '.', '.', '7', '.', '.', '.', '.'],
 			vec!['6', '.', '.', '1', '9', '5', '.', '.', '.'],
 			vec!['.', '9', '8', '.', '.', '.', '.', '6', '.'],
@@ -53,15 +138,23 @@ mod tests {
 			vec!['.', '6', '.', '.', '.', '.', '2', '8', '.'],
 			vec!['.', '.', '.', '4', '1', '9', '.', '.', '5'],
 			vec!['.', '.', '.', '.', '8', '.', '.', '7', '9'],
-		],);
+		];
+		Solution::solve_sudoku(&mut sol,);
 		assert_eq!(ans, sol);
 	}
 
 	#[test]
-	fn test_2() {
-		let mut ans = false;
-		let mut sol = Solution::is_valid_sudoku(vec![
-			vec!['8', '3', '.', '.', '7', '.', '.', '.', '.'],
+	fn arithmetic() {
+		assert_eq!(2, 3 / 2 * 2);
+		let mut is_valid = [0u16; 1];
+		assert_eq!(is_valid, [0]);
+	}
+
+	#[test]
+	fn test_self_valid() {
+		let t = (0, 2,);
+		let mut board = vec![
+			vec!['5', '3', '.', '.', '7', '.', '.', '.', '.'],
 			vec!['6', '.', '.', '1', '9', '5', '.', '.', '.'],
 			vec!['.', '9', '8', '.', '.', '.', '.', '6', '.'],
 			vec!['8', '.', '.', '.', '6', '.', '.', '.', '3'],
@@ -70,69 +163,30 @@ mod tests {
 			vec!['.', '6', '.', '.', '.', '.', '2', '8', '.'],
 			vec!['.', '.', '.', '4', '1', '9', '.', '.', '5'],
 			vec!['.', '.', '.', '.', '8', '.', '.', '7', '9'],
-		],);
-		assert_eq!(ans, sol);
+		];
+		let sol = self_valid(t, &board,);
+		let ans = 0b0000010110;
+		assert_eq!(sol, ans);
 	}
 
 	#[test]
-	fn test_3() {
-		let mut ans = false;
-		let mut sol = Solution::is_valid_sudoku(vec![
-			vec!['.', '.', '4', '.', '.', '.', '6', '3', '.'],
-			vec!['.', '.', '.', '.', '.', '.', '.', '.', '.'],
-			vec!['5', '.', '.', '.', '.', '.', '.', '9', '.'],
-			vec!['.', '.', '.', '5', '6', '.', '.', '.', '.'],
-			vec!['4', '.', '3', '.', '.', '.', '.', '.', '1'],
-			vec!['.', '.', '.', '7', '.', '.', '.', '.', '.'],
-			vec!['.', '.', '.', '5', '.', '.', '.', '.', '.'],
-			vec!['.', '.', '.', '.', '.', '.', '.', '.', '.'],
-			vec!['.', '.', '.', '.', '.', '.', '.', '.', '.'],
-		],);
-		assert_eq!(ans, sol);
+	fn test_yoko_valid() {
+		let t = (0, 2,);
+		let mut board = vec![
+			vec!['5', '3', '.', '.', '7', '.', '.', '.', '.'],
+			vec!['6', '.', '.', '1', '9', '5', '.', '.', '.'],
+			vec!['.', '9', '8', '.', '.', '.', '.', '6', '.'],
+			vec!['8', '.', '.', '.', '6', '.', '.', '.', '3'],
+			vec!['4', '.', '.', '8', '.', '3', '.', '.', '1'],
+			vec!['7', '.', '.', '.', '2', '.', '.', '.', '6'],
+			vec!['.', '6', '.', '.', '.', '.', '2', '8', '.'],
+			vec!['.', '.', '.', '4', '1', '9', '.', '.', '5'],
+			vec!['.', '.', '.', '.', '8', '.', '.', '7', '9'],
+		];
+		let sol = list_up_valid(t, &board,);
+		let ans = 0b1101010110;
+		assert_eq!(sol, ans);
 	}
 }
 
-fn ary_to_list(ary: &[i32],) -> Option<Box<ListNode,>,> {
-	if ary.is_empty() {
-		None
-	} else {
-		Some(Box::new(ListNode { val: ary[0], next: ary_to_list(&ary[1..],), },),)
-	}
-}
-
-fn arys_to_lists(arys: Vec<&[i32],>,) -> Vec<Option<Box<ListNode,>,>,> {
-	arys.iter().map(|&a| ary_to_list(a,),).collect()
-}
-
-#[derive(PartialEq, Eq, Clone, Debug,)]
-pub struct ListNode {
-	pub val:  i32,
-	pub next: Option<Box<ListNode,>,>,
-}
-
-impl ListNode {
-	#[inline]
-	fn new(val: i32,) -> Self { ListNode { next: None, val, } }
-}
-
-// use only when stdin is needed
-fn main() {
-	// todo-comments
-	// FIX:
-	// e: `e` stands for "error"
-	// TODO:
-	// q: `q` stands for "question"
-	// HACK:
-	// a: `a` stands for "attention"
-	// WARN:
-	// x: `x` is abbreviation of "XXX"
-	// PERF:
-	// p: `p` stands for "performance"
-	// NOTE:
-	// d: `d` stands for "description"
-	// TEST:
-	// t: `t` stands for "test"
-	// PASS:
-	// FAIL:
-	println!("2 is {} as u8", '2' as u8);
-}
+fn main() {}
