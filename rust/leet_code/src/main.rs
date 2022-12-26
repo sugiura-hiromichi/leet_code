@@ -3,7 +3,8 @@
 struct Solution;
 impl Solution {
 	pub fn solve_sudoku(board: &mut Vec<Vec<char,>,>,) -> bool {
-		// NOTE: refactor to use bit manipulation later
+		// p: refactor not to use `has_dot`. keep coordinate info to variable.
+		// And use alternate `solve_sudoku(pos:(usize,usize), board: ~)` to recursion
 		while let Some(t,) = has_dot(board,) {
 			let mut validated = self_valid(t, board,);
 			if validated == 0 {
