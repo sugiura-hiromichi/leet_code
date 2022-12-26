@@ -42,44 +42,18 @@ fn has_dot(board: &Vec<Vec<char,>,>,) -> Option<(usize, usize,),> {
 	None
 }
 
-/// returns `[yoko_flag, tate_flag, block_flag]`
-fn list_up_valid(t: (usize, usize,), board: &Vec<Vec<char,>,>,) -> u16 {
-	!(self_valid(t, board,) & other_invalid(t, board,))
-}
-
 /// returns valid flag to the position of `t`
 /// a: take care that flag is set **1~9th**. **NOT 0~8th!**.
 fn self_valid(t: (usize, usize,), board: &Vec<Vec<char,>,>,) -> u16 {
-	yoko_valid(t, board,) | tate_valid(t, board,) | block_valid(t, board,)
-}
-
-/// returns invalid flag to other rows & otehr columns
-fn other_invalid(t: (usize, usize,), board: &Vec<Vec<char,>,>,) -> u16 {
-	// first, set other rows validity
-	// & set other columns validity
-	let mut yoko = 0b1111111110u16;
-	let mut tate = 0b1111111110u16;
-	for i in 0..3 {
-		// unset all flag to valid one
-		if i != t.0 % 3 {
-			yoko &= !yoko_valid((t.0 / 3 * 3 + 1, t.1,), board,);
-		}
-		if i != t.1 % 3 {
-			tate &= !tate_valid((t.0, t.1 / 3 * 3 + 1,), board,);
-		}
-	}
-	// now, `yoko` represents invalid list of other rows
-	// & `tate` represents invalid list of other columns
-
-	tate | yoko
+	yoko_valid(t, board,) & tate_valid(t, board,) & block_valid(t, board,)
 }
 
 fn yoko_valid(t: (usize, usize,), board: &Vec<Vec<char,>,>,) -> u16 {
-	let mut is_valid = 0u16;
+	let mut is_valid = 0b1111111110u16;
 	for i in 0..3 {
 		for j in 0..3 {
 			if let Some(c,) = board[t.0][i * 3 + j].to_digit(10,) {
-				is_valid |= 1 << c;
+				is_valid &= !(1 << c);
 			}
 		}
 	}
@@ -87,11 +61,11 @@ fn yoko_valid(t: (usize, usize,), board: &Vec<Vec<char,>,>,) -> u16 {
 }
 
 fn tate_valid(t: (usize, usize,), board: &Vec<Vec<char,>,>,) -> u16 {
-	let mut is_valid = 0u16;
+	let mut is_valid = 0b1111111110u16;
 	for i in 0..3 {
 		for j in 0..3 {
 			if let Some(c,) = board[i * 3 + j][t.1].to_digit(10,) {
-				is_valid |= 1 << c;
+				is_valid &= !(1 << c);
 			}
 		}
 	}
@@ -99,11 +73,11 @@ fn tate_valid(t: (usize, usize,), board: &Vec<Vec<char,>,>,) -> u16 {
 }
 
 fn block_valid(t: (usize, usize,), board: &Vec<Vec<char,>,>,) -> u16 {
-	let mut is_valid = 0u16;
+	let mut is_valid = 0b1111111110u16;
 	for i in 0..3 {
 		for j in 0..3 {
 			if let Some(c,) = board[t.0 / 3 * 3 + i][t.1 / 3 * 3 + j].to_digit(10,) {
-				is_valid |= 1 << c;
+				is_valid &= !(1 << c);
 			}
 		}
 	}
@@ -114,7 +88,6 @@ fn block_valid(t: (usize, usize,), board: &Vec<Vec<char,>,>,) -> u16 {
 mod tests {
 	use super::*;
 
-	#[ignore]
 	#[test]
 	fn test_1() {
 		let mut ans = vec![
@@ -183,10 +156,50 @@ mod tests {
 			vec!['.', '.', '.', '4', '1', '9', '.', '.', '5'],
 			vec!['.', '.', '.', '.', '8', '.', '.', '7', '9'],
 		];
-		let sol = list_up_valid(t, &board,);
+		let sol = yoko_valid(t, &board,);
 		let ans = 0b1101010110;
+		assert_eq!(sol, ans);
+	}
+
+	#[test]
+	fn test_tate_valid() {
+		let t = (0, 2,);
+		let mut board = vec![
+			vec!['5', '3', '.', '.', '7', '.', '.', '.', '.'],
+			vec!['6', '.', '.', '1', '9', '5', '.', '.', '.'],
+			vec!['.', '9', '8', '.', '.', '.', '.', '6', '.'],
+			vec!['8', '.', '.', '.', '6', '.', '.', '.', '3'],
+			vec!['4', '.', '.', '8', '.', '3', '.', '.', '1'],
+			vec!['7', '.', '.', '.', '2', '.', '.', '.', '6'],
+			vec!['.', '6', '.', '.', '.', '.', '2', '8', '.'],
+			vec!['.', '.', '.', '4', '1', '9', '.', '.', '5'],
+			vec!['.', '.', '.', '.', '8', '.', '.', '7', '9'],
+		];
+		let sol = tate_valid(t, &board,);
+		let ans = 0b1011111110;
+		assert_eq!(sol, ans);
+	}
+
+	#[test]
+	fn test_block_valid() {
+		let t = (0, 2,);
+		let mut board = vec![
+			vec!['5', '3', '.', '.', '7', '.', '.', '.', '.'],
+			vec!['6', '.', '.', '1', '9', '5', '.', '.', '.'],
+			vec!['.', '9', '8', '.', '.', '.', '.', '6', '.'],
+			vec!['8', '.', '.', '.', '6', '.', '.', '.', '3'],
+			vec!['4', '.', '.', '8', '.', '3', '.', '.', '1'],
+			vec!['7', '.', '.', '.', '2', '.', '.', '.', '6'],
+			vec!['.', '6', '.', '.', '.', '.', '2', '8', '.'],
+			vec!['.', '.', '.', '4', '1', '9', '.', '.', '5'],
+			vec!['.', '.', '.', '.', '8', '.', '.', '7', '9'],
+		];
+		let sol = block_valid(t, &board,);
+		let ans = 0b0010010110;
 		assert_eq!(sol, ans);
 	}
 }
 
-fn main() {}
+fn main() {
+	println!("168 is {:b}", 168);
+}
