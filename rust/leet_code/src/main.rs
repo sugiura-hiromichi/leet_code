@@ -2,25 +2,14 @@
 
 struct Solution;
 impl Solution {
-	pub fn count_and_say(n: i32,) -> String {
-		let mut ret = "1".to_string();
-		for _ in 1..n {
-			let mut tmp = "".to_string();
-			loop {
-				let mut i = 0;
-				while i < ret.len() && ret[0..=0] == ret[i..=i] {
-					i += 1;
-				}
-
-				tmp.push_str(&format!("{i}{}", &ret[0..=0]),);
-				if i == ret.len() {
-					ret = tmp;
-					break;
-				}
-				ret = ret[i..].to_string();
-			}
+	pub fn combination_sum(candidates: Vec<i32,>, target: i32,) -> Vec<Vec<i32,>,> {
+		let mut ret = vec![];
+		for i in 0..candidates.len() {
+			let mut max = i;
 		}
-		ret
+
+		// q:
+		todo!()
 	}
 }
 
@@ -30,15 +19,22 @@ mod tests {
 
 	#[test]
 	fn test_1() {
-		let mut ans = "1";
-		let mut sol = Solution::count_and_say(1,);
+		let mut ans = vec![vec![2, 2, 3], vec![7]];
+		let mut sol = Solution::combination_sum(vec![2, 3, 6, 7], 7,);
 		assert_eq!(ans, sol);
 	}
 
 	#[test]
 	fn test_2() {
-		let mut ans = "1211";
-		let mut sol = Solution::count_and_say(4,);
+		let mut ans = vec![vec![2, 2, 2, 2], vec![2, 3, 3], vec![3, 5]];
+		let mut sol = Solution::combination_sum(vec![2, 3, 5], 8,);
+		assert_eq!(ans, sol);
+	}
+
+	#[test]
+	fn test_3() {
+		let mut ans: Vec<Vec<i32,>,> = vec![];
+		let mut sol = Solution::combination_sum(vec![2], 1,);
 		assert_eq!(ans, sol);
 	}
 }
