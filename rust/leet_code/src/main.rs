@@ -5,25 +5,24 @@ impl Solution {
 	pub fn combination_sum(candidates: Vec<i32,>, target: i32,) -> Vec<Vec<i32,>,> {
 		let mut can = candidates;
 		can.sort();
-		core_sum(&can, target,)
+		core_sum(can, target,)
 	}
 }
 
-fn core_sum(can: &[i32], target: i32,) -> Vec<Vec<i32,>,> {
+fn core_sum(can: Vec<i32,>, target: i32,) -> Vec<Vec<i32,>,> {
 	let mut ret = vec![];
 	let mut i = 0;
 	while i + 1 < can.len() && can[i] < target {
 		for n in 1..=target / can[i] {
-			let mut tmp = core_sum(&can[i + 1..], target - n * can[i],);
-			tmp.iter_mut().for_each(|v| {
-				for _a in 0..n {
-					v.push(can[i],);
-				}
-				ret.push(v.clone(),);
-			},);
-
-			if tmp.is_empty() && can[i] * n == target {
+			if can[i] * n == target {
 				ret.push(vec![can[i]; n as usize],);
+			} else {
+				core_sum(can[i + 1..].to_vec(), target - n * can[i],).iter_mut().for_each(|v| {
+					for _ in 0..n {
+						v.push(can[i],);
+					}
+					ret.push(v.clone(),);
+				},);
 			}
 		}
 
