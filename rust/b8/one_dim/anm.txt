@@ -1,6 +1,0 @@
-p [][-.6:1.5] "one_dim.txt" every :::step::step u 2:4 pt 7 ps 5 not
-print step
-step=step+1
-#pause -1
-if(step<1000) reread
-step=0
