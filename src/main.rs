@@ -3,35 +3,35 @@
 struct Solution;
 impl Solution {
 	pub fn is_match(s: String, p: String,) -> bool {
-		if p.len() == 0 || s.len() == 0 {
-			return p.len() == s.len();
+		let (plen, slen,) = (p.len(), s.len(),);
+		// treat edge case
+		if plen == 0 {
+			return slen == 0;
+		} else {
+			let mut i = 0;
+			return !p.contains(|c| c != '*',);
 		}
 		// TODO: dp
-		let (plen, slen,) = (p.len(), s.len(),);
-		let mut dp = vec![
-			{
-				let mut v = vec![false; slen];
-				v.push(true,);
-				v
-			};
-			plen
-		];
-		dp.push(vec![true; slen + 1],);
+		let mut dp = vec![vec![false; slen + 1]; plen + 1];
+		dp[0][0] = true;
+		//if &p[0..1] == "*" { dp[1][0] = true; }
 
-		for i in (0..plen).rev() {
-			for j in (0..slen).rev() {
-				let first_match = s[j..=j] == p[i..=i] || &p[i..=i] == "?" || &p[i..=i] == "*";
-
-				if &p[i..=i] == "*" {
-					// when `&p[i]=="*"`, s[j..]==p[i+1..]
-					dp[i][j] = first_match && dp[i + 1][j];
+		for i in 1..=plen {
+			for j in 1..=slen {
+				let char_match = p[i - 1..i] == s[j - 1..j] || &p[i - 1..i] == "?";
+				if &p[i - 1..i] == "*" {
+					dp[i][j] = dp[i - 1][j - 1] || dp[i][j - 1] || dp[i - 1][j];
+				} else if i > 1 && &p[i - 2..i - 1] == "*" {
+					dp[i][j] = char_match && (dp[i - 1][j - 1] || dp[i - 1][j]);
 				} else {
-					dp[i][j] = first_match && dp[i + 1][j + 1];
+					dp[i][j] = char_match && dp[i - 1][j - 1];
 				}
 			}
+			//if &p[i - 1..i] == "*" && dp[i][1] == true { dp[i][0] = true; }
 		}
 
-		dp[0][0]
+		dp.iter().for_each(|v| println!("{v:?}"),);
+		dp[plen][slen]
 	}
 }
 
@@ -43,23 +43,30 @@ mod tests {
 	#[test]
 	fn test_1() {
 		let mut ans = false;
-		let mut sol = Solution::is_match("aa".to_string(), "a".to_string(),);
+		let mut sol = Solution::is_match("b".to_string(), "?*?".to_string(),);
 		assert_eq!(ans, sol);
 	}
 
 	#[test]
 	fn test_2() {
-		let mut ans = true;
-		let mut sol = Solution::is_match("aa".to_string(), "*".to_string(),);
+		let mut ans = false;
+		let mut sol = Solution::is_match("b".to_string(), "??".to_string(),);
 		assert_eq!(ans, sol);
 	}
 
 	#[test]
-	fn test_3() {
-		let mut ans = false;
-		let mut sol = Solution::is_match("cb".to_string(), "?a".to_string(),);
+	fn test_5() {
+		let mut ans = true;
+		let mut sol = Solution::is_match("abcabczzzde".to_string(), "*abc???de*".to_string(),);
+		assert_eq!(ans, sol);
+	}
+
+	#[test]
+	fn test_6() {
+		let mut ans = true;
+		let mut sol = Solution::is_match("ho".to_string(), "**ho".to_string(),);
 		assert_eq!(ans, sol);
 	}
 }
 
-fn main() {}
+fn main() { let mut sol = Solution::is_match("b".to_string(), "?*?".to_string(),); }
