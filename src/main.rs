@@ -7,14 +7,13 @@ impl Solution {
 		// treat edge case
 		if plen == 0 {
 			return slen == 0;
-		} else {
+		} else if slen == 0 {
 			let mut i = 0;
 			return !p.contains(|c| c != '*',);
 		}
 		// TODO: dp
 		let mut dp = vec![vec![false; slen + 1]; plen + 1];
 		dp[0][0] = true;
-		//if &p[0..1] == "*" { dp[1][0] = true; }
 
 		for i in 1..=plen {
 			for j in 1..=slen {
@@ -22,15 +21,16 @@ impl Solution {
 				if &p[i - 1..i] == "*" {
 					dp[i][j] = dp[i - 1][j - 1] || dp[i][j - 1] || dp[i - 1][j];
 				} else if i > 1 && &p[i - 2..i - 1] == "*" {
-					dp[i][j] = char_match && (dp[i - 1][j - 1] || dp[i - 1][j]);
+					dp[i][j] = char_match && dp[i - 1][j] && (dp[i][j - 1] || dp[i - 1][j - 1]);
 				} else {
 					dp[i][j] = char_match && dp[i - 1][j - 1];
 				}
 			}
-			//if &p[i - 1..i] == "*" && dp[i][1] == true { dp[i][0] = true; }
+			if &p[i - 1..i] == "*" {
+				dp[i][0] = dp[i - 1][0];
+			}
 		}
 
-		dp.iter().for_each(|v| println!("{v:?}"),);
 		dp[plen][slen]
 	}
 }
