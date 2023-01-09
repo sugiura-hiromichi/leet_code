@@ -3,35 +3,33 @@
 struct Solution;
 impl Solution {
 	pub fn is_match(s: String, p: String,) -> bool {
-		let (plen, slen,) = (p.len(), s.len(),);
-		// treat edge case
-		if plen == 0 {
-			return slen == 0;
-		} else if slen == 0 {
-			let mut i = 0;
-			return !p.contains(|c| c != '*',);
-		}
-		// TODO: dp
-		let mut dp = vec![vec![false; slen + 1]; plen + 1];
-		dp[0][0] = true;
-
-		for i in 1..=plen {
-			for j in 1..=slen {
-				let char_match = p[i - 1..i] == s[j - 1..j] || &p[i - 1..i] == "?";
-				if &p[i - 1..i] == "*" {
-					dp[i][j] = dp[i - 1][j - 1] || dp[i][j - 1] || dp[i - 1][j];
-				} else if i > 1 && &p[i - 2..i - 1] == "*" {
-					dp[i][j] = char_match && dp[i - 1][j] && (dp[i][j - 1] || dp[i - 1][j - 1]);
-				} else {
-					dp[i][j] = char_match && dp[i - 1][j - 1];
-				}
-			}
-			if &p[i - 1..i] == "*" {
-				dp[i][0] = dp[i - 1][0];
+		let (mut si, mut pi, mut dp, mut asterisk, slen, plen,) = (0, 0, 0, None, s.len(), p.len(),);
+		while si < slen {
+			if pi < plen && (&p[pi..=pi] == "?" || p[pi..=pi] == s[si..=si]) {
+				// advance both indexes
+				si += 1;
+				pi += 1;
+			} else if pi < plen && &p[pi..=pi] == "*" {
+				// `*` found. Only advance `p` index
+				asterisk = Some(pi,);
+				dp = si;
+				pi += 1;
+			} else if let Some(ast,) = asterisk {
+				// last `p` index points '*'. advance `s` index
+				pi = ast + 1;
+				dp += 1;
+				si = dp;
+			} else {
+				// current & last `p` index does not point '*'. Caracters do not match
+				return false;
 			}
 		}
 
-		dp[plen][slen]
+		while pi < plen && &p[pi..=pi] == "*" {
+			pi += 1;
+		}
+
+		pi == plen
 	}
 }
 
