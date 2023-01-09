@@ -3,26 +3,14 @@
 struct Solution;
 impl Solution {
 	pub fn jump(nums: Vec<i32,>,) -> i32 {
-		let len = nums.len() - 1;
-		let mut i = 0;
-		let mut ret = 0;
-		while i < len {
-			ret += 1;
-			if i + nums[i] as usize >= len {
-				break;
+		let (mut fur, mut end, mut ret, l1,) = (0, 0, 0, nums.len(),);
+		for i in 0..l1 - 1 {
+			fur = fur.max(i + nums[i] as usize,);
+			if i == end {
+				ret += 1;
+				end = fur;
 			}
-			let jump = (len - i).min(nums[i] as usize,);
-			let (mut max, mut tmp_i,) = (0, 0,);
-			for j in 1..=jump {
-				if max < j as i32 + nums[i + j] {
-					max = j as i32 + nums[i + j];
-					tmp_i = j;
-				}
-			}
-
-			i += tmp_i;
 		}
-
 		ret
 	}
 }
