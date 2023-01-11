@@ -5,25 +5,14 @@ impl Solution {
 	pub fn rotate(mtrx: &mut Vec<Vec<i32,>,>,) {
 		let size = mtrx.len();
 		for i in 0..(size + 1) / 2 {
-			Self::swap(mtrx, size, i,);
-		}
-	}
-
-	fn swap(mtrx: &mut Vec<Vec<i32,>,>, size: usize, swapped: usize,) {
-		let len = size - 1 - swapped * 2;
-		let i0 = (swapped, swapped,);
-		let i1 = (i0.0, len + i0.1,);
-		let i2 = (i1.1, i1.1,);
-		let i3 = (i1.1, i1.0,);
-		for l in 0..len {
-			//(mtrx[i0.0][i0.1 + l], mtrx[i1.0 + l][i1.1], mtrx[i2.0][i2.1 - l], mtrx[i3.0 - l][i3.1],) = (mtrx[i3.0 - l][i3.1], mtrx[i0.0][i0.1 + l], mtrx[i1.0 + l][i1.1], mtrx[i2.0][i2.1 - l],);
-
-         let tmp=mtrx[i0.0][i0.1+l];
-         mtrx[i0.0][i0.1+l]=mtrx[i3.0-l][i3.1];
-         mtrx[i3.0-l][i3.1]=mtrx[i2.0][i2.1-l];
-         mtrx[i2.0][i2.1-l]=mtrx[i1.0+l][i1.1];
-         mtrx[i1.0+l][i1.1]=tmp;
-         
+			let len = size - 1 - i * 2;
+			for l in 0..len {
+				let tmp = mtrx[i][i + l];
+				mtrx[i][i + l] = mtrx[len + i - l][i];
+				mtrx[len + i - l][i] = mtrx[len + i][len + i - l];
+				mtrx[len + i][len + i - l] = mtrx[i + l][len + i];
+				mtrx[i + l][len + i] = tmp;
+			}
 		}
 	}
 }
