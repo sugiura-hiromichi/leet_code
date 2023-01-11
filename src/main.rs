@@ -2,18 +2,34 @@
 
 struct Solution;
 impl Solution {
-	pub fn rotate(mtrx: &mut Vec<Vec<i32,>,>,) {
-		let size = mtrx.len();
-		for i in 0..(size + 1) / 2 {
-			let len = size - 1 - i * 2;
-			for l in 0..len {
-				let tmp = mtrx[i][i + l];
-				mtrx[i][i + l] = mtrx[len + i - l][i];
-				mtrx[len + i - l][i] = mtrx[len + i][len + i - l];
-				mtrx[len + i][len + i - l] = mtrx[i + l][len + i];
-				mtrx[i + l][len + i] = tmp;
+	pub fn group_anagrams(mut strs: Vec<String,>,) -> Vec<Vec<String,>,> {
+		let mut ret = vec![];
+		while let Some(mut org,) = strs.pop() {
+			let mut tmp = vec![org.clone()];
+			let mut i = 0;
+			while i < strs.len() {
+				let mut str = strs[i].clone();
+				if org.len() != str.len() {
+					i += 1;
+					continue;
+				}
+				//let str_len = str.len();
+				org.chars().for_each(|c| {
+					if let Some(i,) = str.find(c,) {
+						str.remove(i,);
+					}
+				},);
+
+				if str.is_empty() {
+					tmp.push(strs.remove(i,),);
+				} else {
+					i += 1;
+				}
 			}
+			ret.push(tmp,);
 		}
+
+		ret
 	}
 }
 
@@ -22,21 +38,32 @@ impl Solution {
 mod tests {
 	use super::*;
 
-	fn vectorize(ary: &[&[i32]],) -> Vec<Vec<i32,>,> { ary.iter().map(|a| a.to_vec(),).collect() }
+	fn vectorize(ary: &[&[&str]],) -> Vec<Vec<String,>,> {
+		ary.iter().map(|a| a.iter().map(|s| s.to_string(),).collect(),).collect()
+	}
 
 	#[test]
 	fn test_1() {
-		let mut ans = vectorize(&[&[7, 4, 1,], &[8, 5, 2,], &[9, 6, 3,],],);
-		let mut sol = vectorize(&[&[1, 2, 3,], &[4, 5, 6,], &[7, 8, 9,],],);
-		Solution::rotate(&mut sol,);
+		let mut ans = vectorize(&[&["bat",], &["nat", "tan",], &["ate", "eat", "tea",],],);
+		let mut sol =
+			Solution::group_anagrams(vectorize(&[&["eat", "tea", "tan", "ate", "nat", "bat",],],)[0].clone(),);
+		sol.iter_mut().for_each(|v| v.sort(),);
+		sol.sort();
+		ans.sort();
 		assert_eq!(ans, sol);
 	}
 
 	#[test]
 	fn test_2() {
-		let mut ans = vectorize(&[&[15, 13, 2, 5,], &[14, 3, 4, 1,], &[12, 6, 8, 9,], &[16, 7, 10, 11,],],);
-		let mut sol = vectorize(&[&[5, 1, 9, 11,], &[2, 4, 8, 10,], &[13, 3, 6, 7,], &[15, 14, 12, 16,],],);
-		Solution::rotate(&mut sol,);
+		let mut ans = vectorize(&[&["",],],);
+		let mut sol = Solution::group_anagrams(vectorize(&[&["",],],)[0].clone(),);
+		assert_eq!(ans, sol);
+	}
+
+	#[test]
+	fn test_3() {
+		let mut ans = vectorize(&[&["a",],],);
+		let mut sol = Solution::group_anagrams(vectorize(&[&["a",],],)[0].clone(),);
 		assert_eq!(ans, sol);
 	}
 }
