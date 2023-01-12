@@ -1,31 +1,35 @@
 #![allow(unused)]
 
+const EPSILON: f64 = 1e-10;
+
 struct Solution;
 impl Solution {
-	pub fn group_anagrams(mut strs: Vec<String,>,) -> Vec<Vec<String,>,> {
-		if strs.len() == 0 {
-			return vec![];
-		}
-
-		let mut ret: std::collections::HashMap<[i32; 26], Vec<String,>,> =
-			std::collections::HashMap::new();
-		for str in strs {
-			let mut count = [0; 26];
-			for c in str.chars() {
-				count[c as usize - 'a' as usize] += 1;
+	pub fn my_pow(x: f64, mut n: i32,) -> f64 {
+		let mut ret = 1f64;
+		if n > 0 {
+			while n != 0 {
+				let mut tmp = x;
+				let mut pow_2_lim = 1;
+				while pow_2_lim < n / 2 {
+					pow_2_lim *= 2;
+					tmp *= tmp;
+				}
+				ret *= tmp;
+				n -= pow_2_lim;
 			}
-
-			match ret.get_mut(&count,) {
-				Some(v,) => {
-					v.push(str,);
-				},
-				None => {
-					ret.insert(count, vec![str],);
-				},
+		} else {
+			while n != 0 {
+				let mut tmp = x;
+				let mut pow_2_lim = -1;
+				while pow_2_lim > n / 2 {
+					pow_2_lim *= 2;
+					tmp *= tmp;
+				}
+				ret /= tmp;
+				n -= pow_2_lim;
 			}
 		}
-
-		ret.values().map(|v| v.clone(),).collect()
+		ret
 	}
 }
 
@@ -34,34 +38,26 @@ impl Solution {
 mod tests {
 	use super::*;
 
-	fn vectorize(ary: &[&[&str]],) -> Vec<Vec<String,>,> {
-		ary.iter().map(|a| a.iter().map(|s| s.to_string(),).collect(),).collect()
-	}
-
 	#[test]
 	fn test_1() {
-		let mut ans = vectorize(&[&["bat",], &["nat", "tan",], &["ate", "eat", "tea",],],);
-		let mut sol = Solution::group_anagrams(
-			vectorize(&[&["eat", "tea", "tan", "ate", "nat", "bat",],],)[0].clone(),
-		);
-		sol.iter_mut().for_each(|v| v.sort(),);
-		sol.sort();
-		ans.sort();
-		assert_eq!(ans, sol);
+		let mut ans = 1024f64;
+		let mut sol = Solution::my_pow(2f64, 10,);
+		assert!((ans - sol).abs() < EPSILON);
 	}
 
 	#[test]
 	fn test_2() {
-		let mut ans = vectorize(&[&["",],],);
-		let mut sol = Solution::group_anagrams(vectorize(&[&["",],],)[0].clone(),);
-		assert_eq!(ans, sol);
+		let mut ans = 9.261;
+		let mut sol = Solution::my_pow(2.1, 3,);
+		assert!((ans - sol).abs() < EPSILON);
 	}
 
 	#[test]
 	fn test_3() {
-		let mut ans = vectorize(&[&["a",],],);
-		let mut sol = Solution::group_anagrams(vectorize(&[&["a",],],)[0].clone(),);
+		let mut ans = 0.25;
+		let mut sol = Solution::my_pow(2f64, -2,);
 		assert_eq!(ans, sol);
+		assert!((ans - sol).abs() < EPSILON);
 	}
 }
 
