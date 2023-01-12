@@ -3,33 +3,29 @@
 struct Solution;
 impl Solution {
 	pub fn group_anagrams(mut strs: Vec<String,>,) -> Vec<Vec<String,>,> {
-		let mut ret = vec![];
-		while let Some(mut org,) = strs.pop() {
-			let mut tmp = vec![org.clone()];
-			let mut i = 0;
-			while i < strs.len() {
-				let mut str = strs[i].clone();
-				if org.len() != str.len() {
-					i += 1;
-					continue;
-				}
-				//let str_len = str.len();
-				org.chars().for_each(|c| {
-					if let Some(i,) = str.find(c,) {
-						str.remove(i,);
-					}
-				},);
-
-				if str.is_empty() {
-					tmp.push(strs.remove(i,),);
-				} else {
-					i += 1;
-				}
-			}
-			ret.push(tmp,);
+		if strs.len() == 0 {
+			return vec![];
 		}
 
-		ret
+		let mut ret: std::collections::HashMap<[i32; 26], Vec<String,>,> =
+			std::collections::HashMap::new();
+		for str in strs {
+			let mut count = [0; 26];
+			for c in str.chars() {
+				count[c as usize - 'a' as usize] += 1;
+			}
+
+			match ret.get_mut(&count,) {
+				Some(v,) => {
+					v.push(str,);
+				},
+				None => {
+					ret.insert(count, vec![str],);
+				},
+			}
+		}
+
+		ret.values().map(|v| v.clone(),).collect()
 	}
 }
 
@@ -45,8 +41,9 @@ mod tests {
 	#[test]
 	fn test_1() {
 		let mut ans = vectorize(&[&["bat",], &["nat", "tan",], &["ate", "eat", "tea",],],);
-		let mut sol =
-			Solution::group_anagrams(vectorize(&[&["eat", "tea", "tan", "ate", "nat", "bat",],],)[0].clone(),);
+		let mut sol = Solution::group_anagrams(
+			vectorize(&[&["eat", "tea", "tan", "ate", "nat", "bat",],],)[0].clone(),
+		);
 		sol.iter_mut().for_each(|v| v.sort(),);
 		sol.sort();
 		ans.sort();
