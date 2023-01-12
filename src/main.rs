@@ -4,30 +4,14 @@ const EPSILON: f64 = 1e-10;
 
 struct Solution;
 impl Solution {
-	pub fn my_pow(x: f64, mut n: i32,) -> f64 {
+	pub fn my_pow(mut x: f64, mut n: i32,) -> f64 {
 		let mut ret = 1f64;
-		if n > 0 {
-			while n != 0 {
-				let mut tmp = x;
-				let mut pow_2_lim = 1;
-				while pow_2_lim < n / 2 {
-					pow_2_lim *= 2;
-					tmp *= tmp;
-				}
-				ret *= tmp;
-				n -= pow_2_lim;
+		while n != 0 {
+			if n % 2 != 0 {
+				ret = if n > 0 { ret * x } else { ret / x };
 			}
-		} else {
-			while n != 0 {
-				let mut tmp = x;
-				let mut pow_2_lim = -1;
-				while pow_2_lim > n / 2 {
-					pow_2_lim *= 2;
-					tmp *= tmp;
-				}
-				ret /= tmp;
-				n -= pow_2_lim;
-			}
+			x *= x;
+			n /= 2;
 		}
 		ret
 	}
