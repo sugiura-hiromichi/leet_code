@@ -5,66 +5,55 @@ const EPSILON: f64 = 1e-10;
 struct Solution;
 impl Solution {
 	pub fn solve_n_queens(n: i32,) -> Vec<Vec<String,>,> {
-		let n = n as usize;
-		let mut v = vec![];
-		for i in 0..n {
-			v.push(i,);
-		}
-		let mut list = Self::permute(v,);
-
 		let mut rslt = vec![];
-		'list: for b in list {
-			// validate angled line
-			for i in 0..n {
-				// 135˚
-				let (mut col, mut row,) = if b[i] < i { (0, i - b[i],) } else { (b[i] - i, 0,) };
-				while col < n && row < n {
-					if !(i == row) && b[row] == col {
-						continue 'list;
-					}
-					row += 1;
-					col += 1;
-				}
-
-				// 45˚
-				let (mut ano_col, mut ano_row,) = if i + b[i] > n - 1 {
-					(0, i + b[i] - n + 1,)
-				} else {
-					(n - 1 - (i + b[i]), 0,)
-				};
-				while ano_col < n && ano_row < n {
-					if !(i == ano_row) && b[ano_row] == n - 1 - ano_col {
-						continue 'list;
-					}
-					ano_row += 1;
-					ano_col += 1;
-				}
-			}
-
-			let mut tmp = vec![];
-			b.iter().for_each(|i| tmp.push(".".repeat(*i,) + "Q" + &".".repeat(n - i - 1,),),);
-			rslt.push(tmp,);
-		}
-
+		Self::dfs(n as usize, 0, 0, 0, &mut rslt, &mut vec![],);
 		rslt
 	}
 
-	fn permute(nums: Vec<usize,>,) -> Vec<Vec<usize,>,> {
-		let len = nums.len();
-		if len == 1 {
-			return vec![nums];
+	fn dfs(
+		n: usize,
+		diag_135: i32,
+		diag_45: i32,
+		col_mask: i32,
+		rslt: &mut Vec<Vec<String,>,>,
+		path: &mut Vec<usize,>,
+	) {
+		let bitmask = (1 << n) - 1;
+		if bitmask == col_mask {
+			rslt.push(Self::decode(path, n,),);
+			return;
 		}
-		let mut ret = vec![];
-		for i in 0..len {
-			let mut cl = nums.clone();
-			let rm = cl.remove(i,);
-			Self::permute(cl,).iter_mut().for_each(|v| {
-				v.push(rm,);
-				ret.push(v.clone(),);
-			},)
-		}
+		let available = bitmask & (!(diag_135 | diag_45 | col_mask));
 
-		ret
+		for i in 0..n {
+			let bit_inf = 1 << i;
+			if available & bit_inf == 0 {
+				continue;
+			}
+			path.push(i,);
+
+			Self::dfs(
+				n,
+				(diag_135 | bit_inf) >> 1,
+				(diag_45 | bit_inf) << 1,
+				col_mask | bit_inf,
+				rslt,
+				path,
+			);
+			path.pop();
+		}
+	}
+
+	fn decode(path: &Vec<usize,>, n: usize,) -> Vec<String,> {
+		path.iter()
+			.enumerate()
+			.fold(vec![vec!['.'; n]; n], |mut acc, (i, &j,)| {
+				acc[i][j] = 'Q';
+				acc
+			},)
+			.iter()
+			.map(|c| c.iter().collect(),)
+			.collect()
 	}
 }
 
