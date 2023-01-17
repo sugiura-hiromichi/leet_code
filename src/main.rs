@@ -4,33 +4,25 @@ const EPSILON: f64 = 1e-10;
 
 struct Solution;
 impl Solution {
-	pub fn solve_n_queens(n: i32,) -> Vec<Vec<String,>,> {
-		let mut rslt = vec![];
-		Self::dfs(n as usize, 0, 0, 0, &mut rslt, &mut vec![],);
+	pub fn total_n_queens(n: i32,) -> i32 {
+		let mut rslt = 0;
+		Self::dfs(n as usize, 0, 0, 0, &mut rslt,);
 		rslt
 	}
 
-	fn dfs(
-		n: usize,
-		diag_135: i32,
-		diag_45: i32,
-		col_mask: i32,
-		rslt: &mut Vec<Vec<String,>,>,
-		path: &mut Vec<usize,>,
-	) {
-		let bitmask = (1 << n) - 1;
-		if bitmask == col_mask {
-			rslt.push(Self::decode(path, n,),);
+	fn dfs(n: usize, diag_135: i32, diag_45: i32, col_mask: i32, rslt: &mut i32,) {
+		// set 0~n-1th bit flags by `(1<<n)-1`
+		if (1 << n) - 1 == col_mask {
+			*rslt += 1;
 			return;
 		}
-		let available = bitmask & (!(diag_135 | diag_45 | col_mask));
+		let available = !(diag_135 | diag_45 | col_mask);
 
 		for i in 0..n {
 			let bit_inf = 1 << i;
 			if available & bit_inf == 0 {
 				continue;
 			}
-			path.push(i,);
 
 			Self::dfs(
 				n,
@@ -38,22 +30,8 @@ impl Solution {
 				(diag_45 | bit_inf) << 1,
 				col_mask | bit_inf,
 				rslt,
-				path,
 			);
-			path.pop();
 		}
-	}
-
-	fn decode(path: &Vec<usize,>, n: usize,) -> Vec<String,> {
-		path.iter()
-			.enumerate()
-			.fold(vec![vec!['.'; n]; n], |mut acc, (i, &j,)| {
-				acc[i][j] = 'Q';
-				acc
-			},)
-			.iter()
-			.map(|c| c.iter().collect(),)
-			.collect()
 	}
 }
 
@@ -64,18 +42,15 @@ mod tests {
 
 	#[test]
 	fn test_1() {
-		let mut ans =
-			vec![vec![".Q..", "...Q", "Q...", "..Q."], vec!["..Q.", "Q...", "...Q", ".Q.."]];
-		let mut sol = Solution::solve_n_queens(4,);
-		sol.sort();
-		ans.sort();
+		let mut ans = 2;
+		let mut sol = Solution::total_n_queens(4,);
 		assert_eq!(ans, sol);
 	}
 
 	#[test]
 	fn test_2() {
-		let mut ans = vec![vec!["Q"]];
-		let mut sol = Solution::solve_n_queens(1,);
+		let mut ans = 1;
+		let mut sol = Solution::total_n_queens(1,);
 		assert_eq!(ans, sol);
 	}
 
