@@ -4,34 +4,18 @@ const EPSILON: f64 = 1e-10;
 
 struct Solution;
 impl Solution {
-	pub fn total_n_queens(n: i32,) -> i32 {
-		let mut rslt = 0;
-		Self::dfs(n as usize, 0, 0, 0, &mut rslt,);
-		rslt
-	}
+	// I think DP is recurrence formula
+	pub fn max_sub_array(n: Vec<i32,>,) -> i32 {
+		let len = n.len();
+		let mut dp = vec![0; len];
+		dp[0] = n[0];
+		let mut max = dp[0];
 
-	fn dfs(n: usize, diag_135: i32, diag_45: i32, col_mask: i32, rslt: &mut i32,) {
-		// set 0~n-1th bit flags by `(1<<n)-1`
-		if (1 << n) - 1 == col_mask {
-			*rslt += 1;
-			return;
+		for i in 1..len {
+			dp[i] = n[i] + if dp[i - 1] > 0 { dp[i - 1] } else { 0 };
+			max = max.max(dp[i],);
 		}
-		let available = !(diag_135 | diag_45 | col_mask);
-
-		for i in 0..n {
-			let bit_inf = 1 << i;
-			if available & bit_inf == 0 {
-				continue;
-			}
-
-			Self::dfs(
-				n,
-				(diag_135 | bit_inf) >> 1,
-				(diag_45 | bit_inf) << 1,
-				col_mask | bit_inf,
-				rslt,
-			);
-		}
+		max
 	}
 }
 
@@ -42,29 +26,37 @@ mod tests {
 
 	#[test]
 	fn test_1() {
-		let mut ans = 2;
-		let mut sol = Solution::total_n_queens(4,);
+		let mut ans = 6;
+		let mut sol = Solution::max_sub_array(vec![-2, 1, -3, 4, -1, 2, 1, -5, 4],);
 		assert_eq!(ans, sol);
 	}
 
 	#[test]
 	fn test_2() {
-		let mut ans = 1;
-		let mut sol = Solution::total_n_queens(1,);
+		let mut ans = -1;
+		let mut sol = Solution::max_sub_array(vec![-1],);
 		assert_eq!(ans, sol);
 	}
 
 	#[test]
-	fn label() {
-		let mut v = vec![];
-		'label: for i in 0..10 {
-			if i % 2 == 0 {
-				continue 'label;
-			}
-			v.push(i,);
-		}
+	fn test_3() {
+		let mut ans = 1;
+		let mut sol = Solution::max_sub_array(vec![-2, 1],);
+		assert_eq!(ans, sol);
+	}
 
-		assert_eq!(v, vec![1, 3, 5, 7, 9])
+	#[test]
+	fn test_4() {
+		let mut ans = 2;
+		let mut sol = Solution::max_sub_array(vec![0, -3, -2, -3, -2, 2, -3, 0, 1, -1],);
+		assert_eq!(ans, sol);
+	}
+
+	#[test]
+	fn test_5() {
+		let mut ans = 23;
+		let mut sol = Solution::max_sub_array(vec![5, 4, -1, 7, 8],);
+		assert_eq!(ans, sol);
 	}
 }
 
