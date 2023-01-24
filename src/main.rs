@@ -4,28 +4,13 @@ const EPSILON: f64 = 1e-10;
 
 struct Solution;
 impl Solution {
+	// p: just scan 0 and element which can jump beyond 0. if such element not found, return false
 	pub fn can_jump(nums: Vec<i32,>,) -> bool {
-		let len = nums.len() - 1;
-		let mut i = 0;
-		while i < len {
-			let mut max = i;
-			for j in i + 1..=i + nums[i] as usize {
-				if j == len {
-					return true;
-				}
-				if nums[j] != 0 {
-					if nums[max] as usize + max < j + nums[j] as usize {
-						max = j;
-					}
-				}
-			}
-
-			if max == i {
-				return false;
-			}
-			i = max;
+		let mut n = 1;
+		for i in (0..nums.len() - 1).rev() {
+			n = if nums[i] < n { n + 1 } else { 1 };
 		}
-		true
+		n == 1
 	}
 }
 
@@ -54,6 +39,9 @@ mod tests {
 		let mut sol = Solution::can_jump(vec![5, 9, 3, 2, 1, 0, 2, 3, 3, 1, 0, 0],);
 		assert_eq!(ans, sol);
 	}
+
+	#[test]
+	fn split_tes() { let empty: &[i32] = &[]; }
 }
 
 fn main() {}
