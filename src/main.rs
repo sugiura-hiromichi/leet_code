@@ -2,17 +2,37 @@
 #![allow(unused)]
 struct Solution;
 impl Solution {
-	pub fn length_of_last_word(s: String,) -> i32 {
-		let mut i = s.len();
-		while i > 0 && &s[i - 1..i] == " " {
-			i -= 1;
+	pub fn generate_matrix(n: i32,) -> Vec<Vec<i32,>,> {
+		let mut rslt = vec![vec![0; n as usize]; n as usize];
+		let mut e = 1;
+		for i in 0..n as usize / 2 {
+			let len = n as usize - 2 * i - 1;
+			//top row
+			for j in 0..len {
+				rslt[i][i + j] = e;
+				e += 1;
+			}
+			//right col
+			for j in 0..len {
+				rslt[i + j][len + i] = e;
+				e += 1
+			}
+			//bottom row
+			for j in 0..len {
+				rslt[len + i][len + i - j] = e;
+				e += 1;
+			}
+			//left col
+			for j in 0..len {
+				rslt[len + i - j][i] = e;
+				e += 1;
+			}
 		}
 
-		let tmp = i;
-		while i > 0 && &s[i - 1..i] != " " {
-			i -= 1;
+		if n % 2 == 1 {
+			rslt[n as usize / 2][n as usize / 2] = e;
 		}
-		(tmp - i) as i32
+		rslt
 	}
 }
 
@@ -23,15 +43,15 @@ mod tests {
 
 	#[test]
 	fn test_1() {
-		let mut ans = 5;
-		let mut sol = Solution::length_of_last_word("Hello World".to_string(),);
+		let mut ans = vec![vec![1, 2, 3], vec![8, 9, 4], vec![7, 6, 5]];
+		let mut sol = Solution::generate_matrix(3,);
 		assert_eq!(ans, sol);
 	}
 
 	#[test]
 	fn test_2() {
-		let mut ans = 4;
-		let mut sol = Solution::length_of_last_word("        fly me	t the 	moo ".to_string(),);
+		let mut ans = vec![vec![1]];
+		let mut sol = Solution::generate_matrix(1,);
 		assert_eq!(ans, sol);
 	}
 }
