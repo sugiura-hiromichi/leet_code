@@ -1,3 +1,4 @@
+// •‿•
 #![allow(unused)]
 struct Solution;
 use std::cmp::Ordering;
@@ -64,3 +65,4 @@ mod tests {
 }
 
 fn main() {}
+
