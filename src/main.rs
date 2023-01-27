@@ -1,81 +1,36 @@
 #![allow(unused)]
-
-const EPSILON: f64 = 1e-10;
 struct Solution;
-
-#[derive(Clone,)]
-enum InsPos {
-	Left(usize,),
-	Between(usize,),
-	Right,
-}
-
-impl InsPos {
-	fn unwrap(self, len: usize,) -> usize {
-		match self {
-			Self::Right => len,
-			Self::Between(n,) | Self::Left(n,) => n,
-		}
-	}
-}
-
+use std::cmp::Ordering;
 impl Solution {
 	pub fn insert(itv: Vec<Vec<i32,>,>, new_itv: Vec<i32,>,) -> Vec<Vec<i32,>,> {
 		let len = itv.len();
-		if len == 0 {
-			return vec![new_itv];
+		let (mut s, mut e,) = (new_itv[0], new_itv[1],);
+
+		let li = itv.binary_search_by(Self::pred(s,),).unwrap_or_else(|x| x,);
+		let ri = itv.binary_search_by(Self::pred(e,),).unwrap_or_else(|x| x,);
+		let l = &itv[..(li + usize::from(li < len && itv[li][1] < s,))];
+		let r = &itv[(ri + usize::from(ri >= len || itv[ri][0] <= e,)).min(len,)..];
+
+		// q: what case is cared about in this `if`?
+		// -> this is required to determine range of `vec![s, e]`
+		if l.len() + r.len() != len {
+			s = s.min(itv[l.len()][0],);
+			e = e.max(itv[len - r.len() - 1][1],);
 		}
 
-		let mut rslt = vec![];
-		let (start, end,) = (new_itv[0], new_itv[1],);
-		let (mut s, mut e,) = (InsPos::Right, InsPos::Right,);
+		vec![l, &vec![vec![s, e]], r].concat()
+	}
 
-		for i in 1..itv.len() {
-			if itv[i][0] <= start && start <= itv[i][1] {
-				s = InsPos::Between(i,);
-			} else if itv[i - 1][1] < start && start < itv[i][0] {
-				s = InsPos::Left(i,);
+	fn pred(x: i32,) -> impl Fn(&Vec<i32,>,) -> Ordering {
+		move |i: &Vec<i32,>| {
+			if i[0] > x {
+				Ordering::Greater
+			} else if i[1] < x {
+				Ordering::Less
+			} else {
+				Ordering::Equal
 			}
-			if itv[i][0] <= end && end <= itv[i][1] {
-				e = InsPos::Between(i,);
-			} else if itv[i - 1][1] < end && end < itv[i][0] {
-				e = InsPos::Left(i,);
-			}
 		}
-
-		if start < itv[0][0] {
-			s = InsPos::Left(0,);
-		} else if itv[0][0] <= start && start <= itv[0][1] {
-			s = InsPos::Between(0,);
-		}
-		if itv[0][0] <= end && end <= itv[0][1] {
-			e = InsPos::Between(0,);
-		} else if end < itv[0][0] {
-			e = InsPos::Left(0,);
-		}
-
-		for i in 0..s.clone().unwrap(len,) {
-			rslt.push(itv[i].clone(),);
-		}
-
-		let start = match s {
-			InsPos::Between(i,) => itv[i][0],
-			_ => start,
-		};
-		let end = match e {
-			InsPos::Between(i,) => {
-				e = InsPos::Between(i + 1,);
-				itv[i][1]
-			},
-			_ => end,
-		};
-
-		rslt.push(vec![start, end],);
-		for i in e.unwrap(len,)..len {
-			rslt.push(itv[i].clone(),);
-		}
-
-		rslt
 	}
 }
 
@@ -99,6 +54,12 @@ mod tests {
 			vec![4, 8],
 		);
 		assert_eq!(ans, sol);
+	}
+
+	#[test]
+	fn usize_from() {
+		assert_eq!(usize::from(true), 1);
+		assert_eq!(usize::from(false), 0);
 	}
 }
 
