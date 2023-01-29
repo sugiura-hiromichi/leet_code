@@ -16,39 +16,18 @@ pub struct ListNode {
 
 struct Solution;
 impl Solution {
-	pub fn rotate_right(mut head: Option<Box<ListNode,>,>, k: i32,) -> Option<Box<ListNode,>,> {
-		let mut counter = &head;
-		let mut len = 0;
-		while counter.is_some() {
-			len += 1;
-			counter = &counter.as_ref().unwrap().next;
+	pub fn unique_paths(m: i32, n: i32,) -> i32 {
+		let cargos = m + n - 2;
+		let mut min = m.min(n,) - 1;
+		if min == 0 {
+			return 1;
 		}
-		if len < 2 {
-			return head;
+		let mut rslt: i64 = cargos as i64;
+		for i in 1..min {
+			rslt *= (cargos - i) as i64;
+			rslt /= (i + 1) as i64;
 		}
-		// unmutalize
-		let len = len;
-
-		let k = k as usize % len;
-		if k == 0 {
-			return head;
-		}
-
-		let mut tmp = &mut head;
-		for _i in 1..len - k {
-			tmp = &mut tmp.as_mut().unwrap().next;
-		}
-
-		let mut new_head = tmp.clone().unwrap().next;
-		tmp.as_mut().unwrap().next = None;
-		let mut old_end = &mut new_head;
-		for _i in 1..k {
-			old_end = &mut old_end.as_mut().unwrap().next;
-		}
-
-		old_end.as_mut().unwrap().next = head;
-
-		new_head.clone()
+		rslt as i32
 	}
 }
 
@@ -65,15 +44,15 @@ mod tests {
 
 	#[test]
 	fn test_1() {
-		let mut ans = ary_to_list(&[4, 5, 1, 2, 3,],);
-		let mut sol = Solution::rotate_right(ary_to_list(&[1, 2, 3, 4, 5,],), 2,);
+		let mut ans = 28;
+		let mut sol = Solution::unique_paths(3, 7,);
 		assert_eq!(ans, sol);
 	}
 
 	#[test]
 	fn test_2() {
-		let mut ans = ary_to_list(&[2, 0, 1,],);
-		let mut sol = Solution::rotate_right(ary_to_list(&[0, 1, 2,],), 4,);
+		let mut ans = 3;
+		let mut sol = Solution::unique_paths(3, 2,);
 		assert_eq!(ans, sol);
 	}
 
