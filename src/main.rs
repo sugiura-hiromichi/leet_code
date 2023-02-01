@@ -16,31 +16,21 @@ pub struct ListNode {
 
 struct Solution;
 impl Solution {
-	pub fn unique_paths_with_obstacles(map: Vec<Vec<i32,>,>,) -> i32 {
-		if map[0][0] == 1 {
-			return 0;
-		}
-		// TODO: dp
+	pub fn min_path_sum(mut map: Vec<Vec<i32,>,>,) -> i32 {
 		let (row, col,) = (map.len(), map[0].len(),);
-		let mut dp = vec![vec![0; col]; row];
-
-		dp[0][0] = 1;
-		for i in 1..col {
-			dp[0][i] = i32::from(map[0][i] == 0 && dp[0][i - 1] == 1,);
-		}
 		for i in 1..row {
-			dp[i][0] = i32::from(map[i][0] == 0 && dp[i - 1][0] == 1,);
+			map[i][0] += map[i - 1][0];
+		}
+		for i in 1..col {
+			map[0][i] += map[0][i - 1];
 		}
 
 		for i in 1..row {
 			for j in 1..col {
-				if map[i][j] == 0 {
-					dp[i][j] = if map[i - 1][j] == 0 { dp[i - 1][j] } else { 0 }
-						+ if map[i][j - 1] == 0 { dp[i][j - 1] } else { 0 };
-				}
+				map[i][j] += map[i - 1][j].min(map[i][j - 1],);
 			}
 		}
-		dp[row - 1][col - 1]
+		map[row - 1][col - 1]
 	}
 }
 
@@ -57,39 +47,20 @@ mod tests {
 
 	#[test]
 	fn test_1() {
-		let mut ans = 2;
-		let mut sol = Solution::unique_paths_with_obstacles(vec![
-			vec![0, 0, 0],
-			vec![0, 1, 0],
-			vec![0, 0, 0],
+		let mut ans = 7;
+		let mut sol = Solution::min_path_sum(vec![
+			vec![1, 3, 1],
+			vec![1, 5, 1],
+			vec![4, 2, 1],
 		],);
 		assert_eq!(ans, sol);
 	}
 
 	#[test]
 	fn test_2() {
-		let mut ans = 1;
-		let mut sol = Solution::unique_paths_with_obstacles(vec![vec![0, 1], vec![0, 0]],);
+		let mut ans = 12;
+		let mut sol = Solution::min_path_sum(vec![vec![1, 2, 3], vec![4, 5, 6]],);
 		assert_eq!(ans, sol);
-	}
-
-	#[test]
-	fn test_3() {
-		let mut ans = 1;
-		let mut sol = Solution::unique_paths_with_obstacles(vec![vec![0]],);
-		assert_eq!(ans, sol);
-	}
-
-	#[test]
-	fn test_4() {
-		let mut ans = 2;
-		let mut sol = Solution::unique_paths_with_obstacles(vec![vec![0, 0], vec![0, 0]],);
-		assert_eq!(ans, sol);
-	}
-
-	#[test]
-	fn list_next() {
-		assert_eq!(i32::from(true), 1);
 	}
 }
 
