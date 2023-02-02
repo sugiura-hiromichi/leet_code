@@ -3,42 +3,56 @@
 #![feature(test)]
 
 extern crate test;
-use std::rc::Rc;
-
 use test::black_box;
 use test::Bencher;
 
-#[derive(PartialEq, Eq, Clone, Debug,)]
-pub struct ListNode {
-	pub val:  i32,
-	pub next: Option<Box<ListNode,>,>,
-}
-
 struct Solution;
 impl Solution {
-	pub fn min_path_sum(mut map: Vec<Vec<i32,>,>,) -> i32 {
-		let (row, col,) = (map.len(), map[0].len(),);
-		for i in 1..row {
-			map[i][0] += map[i - 1][0];
-		}
-		for i in 1..col {
-			map[0][i] += map[0][i - 1];
-		}
+	pub fn is_number(s: String,) -> bool {
+		// q:
+		let len = s.len();
+		let mut rslt = true;
+		let mut req_int = false;
+		let mut was_dig = false;
+		let mut already_sci = false;
 
-		for i in 1..row {
-			for j in 1..col {
-				map[i][j] += map[i - 1][j].min(map[i][j - 1],);
+		for (i, c,) in s.chars().enumerate() {
+			if c.is_numeric() {
+				was_dig = true;
+			} else {
+				if c == '+' || c == '-' {
+					rslt = (i == 0 || (i > 0 && (&s[i - 1..i] == "e" || &s[i - 1..i] == "E")))
+						&& i + 1 < len && match s.chars().nth(i + 1,) {
+						Some(c,) if c.is_numeric() || c == '.' => true,
+						_ => false,
+					};
+				} else if c == 'e' || c == 'E' {
+					rslt = !already_sci
+						&& i + 1 < len && match s.chars().nth(i + 1,) {
+						Some(c,) if c.is_numeric() || c == '.' || c == '+' || c == '-' => true,
+						_ => false,
+					} && i != 0;
+					req_int = true;
+					already_sci = true;
+				} else if c == '.' {
+					rslt = (was_dig
+						|| (i < len - 1 && s.chars().nth(i + 1,).unwrap().is_numeric()))
+						&& !req_int;
+					req_int = true;
+				} else {
+					rslt = false;
+				}
+
+				was_dig = false;
+			}
+
+			if rslt == false {
+				break;
 			}
 		}
-		map[row - 1][col - 1]
-	}
-}
 
-fn ary_to_list(a: &[i32],) -> Option<Box<ListNode,>,> {
-	Some(Box::new(ListNode {
-		val:  a[0],
-		next: if a.len() == 1 { None } else { ary_to_list(&a[1..],) },
-	},),)
+		rslt
+	}
 }
 
 #[cfg(test)]
@@ -47,19 +61,42 @@ mod tests {
 
 	#[test]
 	fn test_1() {
-		let mut ans = 7;
-		let mut sol = Solution::min_path_sum(vec![
-			vec![1, 3, 1],
-			vec![1, 5, 1],
-			vec![4, 2, 1],
-		],);
+		let mut ans = true;
+		let mut sol = Solution::is_number("0".to_string(),);
 		assert_eq!(ans, sol);
 	}
 
 	#[test]
 	fn test_2() {
-		let mut ans = 12;
-		let mut sol = Solution::min_path_sum(vec![vec![1, 2, 3], vec![4, 5, 6]],);
+		let mut ans = false;
+		let mut sol = Solution::is_number("e".to_string(),);
+		assert_eq!(ans, sol);
+	}
+
+	#[test]
+	fn test_3() {
+		let mut ans = true;
+		let mut sol = Solution::is_number("+.8".to_string(),);
+		assert_eq!(ans, sol);
+	}
+	#[test]
+	fn test_4() {
+		let mut ans = true;
+		let mut sol = Solution::is_number("3.".to_string(),);
+		assert_eq!(ans, sol);
+	}
+
+	#[test]
+	fn test_5() {
+		let mut ans = false;
+		let mut sol = Solution::is_number("9e3e2".to_string(),);
+		assert_eq!(ans, sol);
+	}
+
+	#[test]
+	fn test_6() {
+		let mut ans = true;
+		let mut sol = Solution::is_number("46.e+3".to_string(),);
 		assert_eq!(ans, sol);
 	}
 }
