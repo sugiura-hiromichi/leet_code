@@ -8,50 +8,20 @@ use test::Bencher;
 
 struct Solution;
 impl Solution {
-	pub fn is_number(s: String,) -> bool {
-		// q:
-		let len = s.len();
-		let mut rslt = true;
-		let mut req_int = false;
-		let mut was_dig = false;
-		let mut already_sci = false;
-
-		for (i, c,) in s.chars().enumerate() {
-			if c.is_numeric() {
-				was_dig = true;
-			} else {
-				if c == '+' || c == '-' {
-					rslt = (i == 0 || (i > 0 && (&s[i - 1..i] == "e" || &s[i - 1..i] == "E")))
-						&& i + 1 < len && match s.chars().nth(i + 1,) {
-						Some(c,) if c.is_numeric() || c == '.' => true,
-						_ => false,
-					};
-				} else if c == 'e' || c == 'E' {
-					rslt = !already_sci
-						&& i + 1 < len && match s.chars().nth(i + 1,) {
-						Some(c,) if c.is_numeric() || c == '.' || c == '+' || c == '-' => true,
-						_ => false,
-					} && i != 0;
-					req_int = true;
-					already_sci = true;
-				} else if c == '.' {
-					rslt = (was_dig
-						|| (i < len - 1 && s.chars().nth(i + 1,).unwrap().is_numeric()))
-						&& !req_int;
-					req_int = true;
-				} else {
-					rslt = false;
-				}
-
-				was_dig = false;
-			}
-
-			if rslt == false {
-				break;
-			}
+	pub fn plus_one(mut digs: Vec<i32,>,) -> Vec<i32,> {
+		let mut i = digs.len() - 1;
+		while i > 0 && digs[i] == 9 {
+			digs[i] = 0;
+			i -= 1;
 		}
 
-		rslt
+		if i == 0 && digs[0] == 9 {
+			digs[0] = 0;
+			digs.insert(0, 1,);
+		} else {
+			digs[i] += 1;
+		}
+		digs
 	}
 }
 
@@ -61,42 +31,22 @@ mod tests {
 
 	#[test]
 	fn test_1() {
-		let mut ans = true;
-		let mut sol = Solution::is_number("0".to_string(),);
+		let mut ans = vec![1, 2, 4];
+		let mut sol = Solution::plus_one(vec![1, 2, 3],);
 		assert_eq!(ans, sol);
 	}
 
 	#[test]
 	fn test_2() {
-		let mut ans = false;
-		let mut sol = Solution::is_number("e".to_string(),);
+		let mut ans = vec![4, 3, 2, 2];
+		let mut sol = Solution::plus_one(vec![4, 3, 2, 1],);
 		assert_eq!(ans, sol);
 	}
 
 	#[test]
 	fn test_3() {
-		let mut ans = true;
-		let mut sol = Solution::is_number("+.8".to_string(),);
-		assert_eq!(ans, sol);
-	}
-	#[test]
-	fn test_4() {
-		let mut ans = true;
-		let mut sol = Solution::is_number("3.".to_string(),);
-		assert_eq!(ans, sol);
-	}
-
-	#[test]
-	fn test_5() {
-		let mut ans = false;
-		let mut sol = Solution::is_number("9e3e2".to_string(),);
-		assert_eq!(ans, sol);
-	}
-
-	#[test]
-	fn test_6() {
-		let mut ans = true;
-		let mut sol = Solution::is_number("46.e+3".to_string(),);
+		let mut ans = vec![1, 0];
+		let mut sol = Solution::plus_one(vec![9],);
 		assert_eq!(ans, sol);
 	}
 }
