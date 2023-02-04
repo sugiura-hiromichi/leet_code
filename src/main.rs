@@ -10,18 +10,7 @@ struct Solution;
 impl Solution {
 	// fibonacci
 	pub fn climb_stairs(x: i32,) -> i32 {
-		if x < 3 {
-			return x;
-		}
-
-		let (mut one_bef, mut two_bef, mut sum,) = (2, 1, 0,);
-		for i in 2..x {
-			sum = one_bef + two_bef;
-			two_bef = one_bef;
-			one_bef = sum;
-		}
-
-		sum
+		(0..x).fold((1, 0,), |(rslt, prev,), _| (rslt + prev, rslt,),).0
 	}
 }
 
