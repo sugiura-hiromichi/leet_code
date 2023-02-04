@@ -8,17 +8,20 @@ use test::Bencher;
 
 struct Solution;
 impl Solution {
+	// fibonacci
 	pub fn climb_stairs(x: i32,) -> i32 {
-		let mut rslt = 1;
-		for i in 1..=x / 2 {
-			rslt += Self::combination((x - i) as u128, i as u128,);
+		if x < 3 {
+			return x;
 		}
 
-		rslt
-	}
+		let (mut one_bef, mut two_bef, mut sum,) = (2, 1, 0,);
+		for i in 2..x {
+			sum = one_bef + two_bef;
+			two_bef = one_bef;
+			one_bef = sum;
+		}
 
-	fn combination(total: u128, select: u128,) -> i32 {
-		((total - select + 1..=total).product::<u128>() / (1..=select).product::<u128>()) as i32
+		sum
 	}
 }
 
