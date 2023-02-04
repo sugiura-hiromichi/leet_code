@@ -8,24 +8,17 @@ use test::Bencher;
 
 struct Solution;
 impl Solution {
-	pub fn my_sqrt(x: i32,) -> i32 {
-		let (mut l, mut r,) = (0, x,);
-		while l < r {
-			let mid = (l + r) / 2;
-			let (rslt, flowed,) = mid.overflowing_mul(mid,);
-			if !flowed && rslt < x {
-				l = mid + 1;
-			} else {
-				r = mid;
-			}
+	pub fn climb_stairs(x: i32,) -> i32 {
+		let mut rslt = 1;
+		for i in 1..=x / 2 {
+			rslt += Self::combination((x - i) as u128, i as u128,);
 		}
 
-		let (rslt, flowed,) = l.overflowing_mul(l,);
-		if !flowed && rslt <= x {
-			l
-		} else {
-			l - 1
-		}
+		rslt
+	}
+
+	fn combination(total: u128, select: u128,) -> i32 {
+		((total - select + 1..=total).product::<u128>() / (1..=select).product::<u128>()) as i32
 	}
 }
 
@@ -36,21 +29,14 @@ mod tests {
 	#[test]
 	fn test_1() {
 		let mut ans = 2;
-		let mut sol = Solution::my_sqrt(4,);
+		let mut sol = Solution::climb_stairs(2,);
 		assert_eq!(ans, sol);
 	}
 
 	#[test]
 	fn test_2() {
-		let mut ans = 2;
-		let mut sol = Solution::my_sqrt(8,);
-		assert_eq!(ans, sol);
-	}
-
-	#[test]
-	fn test_3() {
-		let mut ans = 46339;
-		let mut sol = Solution::my_sqrt(2147395599,);
+		let mut ans = 5;
+		let mut sol = Solution::climb_stairs(4,);
 		assert_eq!(ans, sol);
 	}
 }
