@@ -8,63 +8,28 @@ use test::Bencher;
 
 struct Solution;
 impl Solution {
-	pub fn simplify_path(mut p: String,) -> String {
-		p.push('/',);
-		// treat duplicated slash
-		Self::remove_dup_slash(&mut p,);
-		// remove `./`
-		Self::remove_explicit_curdir(&mut p,);
-		// remove `../`
-		Self::remove_explicit_parent_dir(&mut p,);
+	pub fn simplify_path(path: String,) -> String {
+		let mut p = path.split('/',);
+		let mut valid_path = vec![];
+		let mut rslt = String::new();
 
-		if p.len() == 1 {
-			p
+		p.for_each(|s| {
+			if !valid_path.is_empty() && s == ".." {
+				valid_path.pop();
+			} else if s != "" && s != "." && s != ".." {
+				valid_path.push(s,);
+			}
+		},);
+
+		if valid_path.is_empty() {
+			rslt.push('/',);
 		} else {
-			p.pop();
-			p
+			valid_path.iter().for_each(|s| {
+				rslt.push('/',);
+				rslt.push_str(s,);
+			},);
 		}
-	}
-
-	fn remove_dup_slash(p: &mut String,) {
-		let mut i = 0;
-		while i < p.len() - 1 {
-			if &p[i..=i] == "/" {
-				let mut j = i + 1;
-				while j < p.len() && &p[j..=j] == "/" {
-					j += 1;
-				}
-				p.replace_range(i + 1..j, "",);
-			}
-			i += 1;
-		}
-	}
-
-	fn remove_explicit_curdir(p: &mut String,) {
-		let mut i = 0;
-		while p.len() > 2 && i < p.len() - 2 {
-			if &p[i..i + 3] == "/./" {
-				p.replace_range(i..i + 2, "",);
-			} else {
-				i += 1;
-			}
-		}
-	}
-
-	fn remove_explicit_parent_dir(p: &mut String,) {
-		let mut i = 0;
-		while p.len() > 3 && i < p.len() - 3 {
-			if &p[i..i + 4] == "/../" {
-				if i == 0 {
-					p.replace_range(i..i + 3, "",);
-				} else {
-					let start = p[..i].rfind('/',).unwrap();
-					p.replace_range(start..i + 3, "",);
-					i = start;
-				}
-			} else {
-				i += 1;
-			}
-		}
+		rslt
 	}
 }
 
@@ -109,7 +74,4 @@ mod benchs {
 	}
 }
 
-fn main() {
-	let root = Solution::simplify_path("/.././.../././".to_string(),);
-	assert_eq!("/...", root);
-}
+fn main() {}
