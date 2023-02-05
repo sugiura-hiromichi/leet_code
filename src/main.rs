@@ -9,27 +9,20 @@ use test::Bencher;
 struct Solution;
 impl Solution {
 	pub fn simplify_path(path: String,) -> String {
-		let mut p = path.split('/',);
-		let mut valid_path = vec![];
-		let mut rslt = String::new();
-
-		p.for_each(|s| {
-			if !valid_path.is_empty() && s == ".." {
-				valid_path.pop();
-			} else if s != "" && s != "." && s != ".." {
-				valid_path.push(s,);
-			}
-		},);
-
-		if valid_path.is_empty() {
-			rslt.push('/',);
-		} else {
-			valid_path.iter().for_each(|s| {
-				rslt.push('/',);
-				rslt.push_str(s,);
-			},);
-		}
-		rslt
+		format!(
+			"/{}",
+			path.split('/')
+				.filter(|&s| s != "" && s != ".")
+				.fold(vec![], |mut acc, s| {
+					if s == ".." {
+						acc.pop();
+					} else {
+						acc.push(s,);
+					}
+					acc
+				})
+				.join("/")
+		)
 	}
 }
 
