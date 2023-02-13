@@ -4,29 +4,35 @@
 
 struct Solution;
 impl Solution {
-	pub fn set_zeroes(mtrx: &mut Vec<Vec<i32,>,>,) {
-		let mut set = std::collections::HashSet::new();
-		for i in 0..mtrx.len() {
-			for j in 0..mtrx[0].len() {
-				if mtrx[i][j] == 0 {
-					set.insert((i, j,),);
-				}
+	pub fn search_matrix(matrix: Vec<Vec<i32,>,>, target: i32,) -> bool {
+		let (mut a, mut b,) = (0, matrix.len(),);
+		while a < b {
+			let mid = (a + b) / 2;
+			if matrix[mid][0] < target {
+				a = mid + 1;
+			} else {
+				b = mid;
 			}
 		}
 
-		set.iter().for_each(|(i, j,)| {
-			Self::set_zero(mtrx, *i, *j,);
-		},)
-	}
+		if a < matrix.len() && matrix[a][0] == target {
+			return true;
+		}
 
-	fn set_zero(mtrx: &mut Vec<Vec<i32,>,>, i: usize, j: usize,) {
-		for x in 0..mtrx.len() {
-			for y in 0..mtrx[0].len() {
-				if x == i || y == j {
-					mtrx[x][y] = 0;
-				}
+		let row = if a == 0 { 0 } else { a - 1 };
+		a = 0;
+		b = matrix[0].len();
+		while a < b {
+			let mid = (a + b) / 2;
+			if matrix[row][mid] < target {
+				a = mid + 1;
+			} else {
+				b = mid;
 			}
 		}
+
+		a < matrix[0].len() && matrix[row][a] == target
+			|| matrix[row][if a == 0 { 0 } else { a - 1 }] == target
 	}
 }
 
@@ -36,17 +42,35 @@ mod tests {
 
 	#[test]
 	fn test_1() {
-		let mut ans = vec![vec![1, 0, 1], vec![0, 0, 0], vec![1, 0, 1]];
-		let mut sol = vec![vec![1, 1, 1], vec![1, 0, 1], vec![1, 1, 1]];
-		Solution::set_zeroes(&mut sol,);
+		let mut ans = true;
+		let mut sol = Solution::search_matrix(
+			vec![vec![1, 3, 5, 7], vec![10, 11, 16, 20], vec![23, 30, 34, 60]],
+			3,
+		);
 		assert_eq!(ans, sol);
 	}
 
 	#[test]
 	fn test_2() {
-		let mut ans = vec![vec![0, 0, 0, 0], vec![0, 4, 5, 0], vec![0, 3, 1, 0]];
-		let mut sol = vec![vec![0, 1, 2, 0], vec![3, 4, 5, 2], vec![1, 3, 1, 5]];
-		Solution::set_zeroes(&mut sol,);
+		let mut ans = false;
+		let mut sol = Solution::search_matrix(
+			vec![vec![1, 3, 5, 7], vec![10, 11, 16, 20], vec![23, 30, 34, 60]],
+			13,
+		);
+		assert_eq!(ans, sol);
+	}
+
+	#[test]
+	fn test_3() {
+		let mut ans = false;
+		let mut sol = Solution::search_matrix(vec![vec![1]], 0,);
+		assert_eq!(ans, sol);
+	}
+
+	#[test]
+	fn test_4() {
+		let mut ans = false;
+		let mut sol = Solution::search_matrix(vec![vec![1]], 2,);
 		assert_eq!(ans, sol);
 	}
 }
