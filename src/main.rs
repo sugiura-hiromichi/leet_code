@@ -4,22 +4,28 @@
 
 struct Solution;
 impl Solution {
-	pub fn min_distance(w1: String, w2: String,) -> i32 {
-		Self::rec(&w1, &w2, w1.len(), w2.len(),) as i32
+	pub fn set_zeroes(mtrx: &mut Vec<Vec<i32,>,>,) {
+		let mut set = std::collections::HashSet::new();
+		for i in 0..mtrx.len() {
+			for j in 0..mtrx[0].len() {
+				if mtrx[i][j] == 0 {
+					set.insert((i, j,),);
+				}
+			}
+		}
+
+		set.iter().for_each(|(i, j,)| {
+			Self::set_zero(mtrx, *i, *j,);
+		},)
 	}
 
-	fn rec(w1: &String, w2: &String, len1: usize, len2: usize,) -> usize {
-		if len1 == 0 {
-			len2
-		} else if len2 == 0 {
-			len1
-		} else if w1[len1 - 1..len1] == w2[len2 - 1..len2] {
-			Self::rec(w1, w2, len1 - 1, len2 - 1,)
-		} else {
-			let ins = Self::rec(w1, w2, len1, len2 - 1,);
-			let del = Self::rec(w1, w2, len1 - 1, len2,);
-			let rep = Self::rec(w1, w2, len1 - 1, len2 - 1,);
-			ins.min(del.min(rep,),) + 1
+	fn set_zero(mtrx: &mut Vec<Vec<i32,>,>, i: usize, j: usize,) {
+		for x in 0..mtrx.len() {
+			for y in 0..mtrx[0].len() {
+				if x == i || y == j {
+					mtrx[x][y] = 0;
+				}
+			}
 		}
 	}
 }
@@ -30,22 +36,17 @@ mod tests {
 
 	#[test]
 	fn test_1() {
-		let mut ans = 3;
-		let mut sol = Solution::min_distance("horse".to_string(), "ros".to_string(),);
+		let mut ans = vec![vec![1, 0, 1], vec![0, 0, 0], vec![1, 0, 1]];
+		let mut sol = vec![vec![1, 1, 1], vec![1, 0, 1], vec![1, 1, 1]];
+		Solution::set_zeroes(&mut sol,);
 		assert_eq!(ans, sol);
 	}
 
 	#[test]
 	fn test_2() {
-		let mut ans = 5;
-		let mut sol = Solution::min_distance("intention".to_string(), "execution".to_string(),);
-		assert_eq!(ans, sol);
-	}
-
-	#[test]
-	fn test_3() {
-		let mut ans = 1;
-		let mut sol = Solution::min_distance("a".to_string(), "".to_string(),);
+		let mut ans = vec![vec![0, 0, 0, 0], vec![0, 4, 5, 0], vec![0, 3, 1, 0]];
+		let mut sol = vec![vec![0, 1, 2, 0], vec![3, 4, 5, 2], vec![1, 3, 1, 5]];
+		Solution::set_zeroes(&mut sol,);
 		assert_eq!(ans, sol);
 	}
 }
