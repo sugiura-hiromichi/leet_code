@@ -4,35 +4,30 @@
 
 struct Solution;
 impl Solution {
-	pub fn search_matrix(matrix: Vec<Vec<i32,>,>, target: i32,) -> bool {
-		let (mut a, mut b,) = (0, matrix.len(),);
-		while a < b {
-			let mid = (a + b) / 2;
-			if matrix[mid][0] < target {
-				a = mid + 1;
-			} else {
-				b = mid;
+	pub fn sort_colors(colors: &mut Vec<i32,>,) {
+		let (mut cur0, mut cur1,) = (0, 0,);
+		for i in 0..colors.len() {
+			if colors[i] == 0 {
+				if i != cur0 {
+					if colors[cur0] == 1 {
+						colors[i] = colors[cur1];
+						colors[cur1] = 1;
+					} else {
+						colors[i] = colors[cur0];
+					}
+					colors[cur0] = 0;
+				}
+				cur0 += 1;
+				cur1 += 1;
+			} else if colors[i] == 1 {
+				if i != cur1 {
+					colors[i] = colors[cur1]; //`colors[cur1]` should be `2`
+					colors[cur1] = 1;
+				}
+				cur1 += 1;
 			}
+			//println!("colors is {colors:?}");
 		}
-
-		if a < matrix.len() && matrix[a][0] == target {
-			return true;
-		}
-
-		let row = if a == 0 { 0 } else { a - 1 };
-		a = 0;
-		b = matrix[0].len();
-		while a < b {
-			let mid = (a + b) / 2;
-			if matrix[row][mid] < target {
-				a = mid + 1;
-			} else {
-				b = mid;
-			}
-		}
-
-		a < matrix[0].len() && matrix[row][a] == target
-			|| matrix[row][if a == 0 { 0 } else { a - 1 }] == target
 	}
 }
 
@@ -42,35 +37,25 @@ mod tests {
 
 	#[test]
 	fn test_1() {
-		let mut ans = true;
-		let mut sol = Solution::search_matrix(
-			vec![vec![1, 3, 5, 7], vec![10, 11, 16, 20], vec![23, 30, 34, 60]],
-			3,
-		);
-		assert_eq!(ans, sol);
-	}
-
-	#[test]
-	fn test_2() {
-		let mut ans = false;
-		let mut sol = Solution::search_matrix(
-			vec![vec![1, 3, 5, 7], vec![10, 11, 16, 20], vec![23, 30, 34, 60]],
-			13,
-		);
+		let mut ans = vec![0, 0, 1, 1, 2, 2];
+		let mut sol = vec![2, 0, 2, 1, 1, 0];
+		Solution::sort_colors(&mut sol,);
 		assert_eq!(ans, sol);
 	}
 
 	#[test]
 	fn test_3() {
-		let mut ans = false;
-		let mut sol = Solution::search_matrix(vec![vec![1]], 0,);
+		let mut ans = vec![0, 1];
+		let mut sol = vec![1, 0];
+		Solution::sort_colors(&mut sol,);
 		assert_eq!(ans, sol);
 	}
 
 	#[test]
-	fn test_4() {
-		let mut ans = false;
-		let mut sol = Solution::search_matrix(vec![vec![1]], 2,);
+	fn test_2() {
+		let mut ans = vec![0, 1, 2];
+		let mut sol = vec![2, 0, 1];
+		Solution::sort_colors(&mut sol,);
 		assert_eq!(ans, sol);
 	}
 }
