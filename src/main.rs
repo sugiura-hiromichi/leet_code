@@ -5,63 +5,35 @@
 struct Solution;
 impl Solution {
 	pub fn min_window(s: String, t: String,) -> String {
-		let mut rslt = "".to_string();
-		let mut l = match s.find(|c| t.contains(c,),) {
-			Some(i,) if i < s.len() => i,
-			_ => return rslt,
-		};
-		let mut r = if t.len() > 1 {
-			match s[l + 1..].find(|c| t.contains(c,),) {
-				Some(i,) => l + i + 1,
-				None => return rslt,
-			}
-		} else {
-			return t;
-		};
-
-		let mut t_chars = t.chars().fold(std::collections::HashMap::new(), |mut hm, c| {
-			hm.entry(c.to_string(),).and_modify(|i| *i += 1,).or_insert(1,);
+		let s_bytes = s.as_bytes();
+		type ChGraph = std::collections::HashMap<u8, i32,>;
+		let mut t_chars = t.bytes().fold(ChGraph::new(), |mut hm, b| {
+			*hm.entry(b,).or_default() -= 1;
 			hm
 		},);
-		for i in l..r {
-			t_chars.entry(s[i..=i].to_string(),).and_modify(|i| *i -= 1,);
+
+		let (mut rslt, mut l,) = ((0, 0,), 0,);
+		for r in 1..=s.len() {
+			match t_chars.get_mut(&s_bytes[r - 1],) {
+				None => continue,
+				Some(i,) => {
+					*i += 1;
+				},
+			}
+
+			while l < r {
+				if let Some(i,) = t_chars.get_mut(&s_bytes[l],) {
+					*i -= if *i > 0 { 1 } else { break };
+				}
+				l += 1;
+			}
+
+			if (0 == rslt.1 || r - l < rslt.1 - rslt.0) && t_chars.values().all(|&i| i >= 0,) {
+				rslt = (l, r,);
+			}
 		}
 
-		let s_len = s.len();
-		let mut r_reached = false;
-		// NOTE: `t_chars[&key]<0` means s[l..r] contains enough `key`
-		// otherwise, `t_chars[&key]>0` means s[l..r] shortages `key`
-		loop {
-			if t_chars[&s[l..=l].to_string()] < 0 {
-				t_chars.entry(s[l..=l].to_string(),).and_modify(|i| *i += 1,);
-				l += 1 + s[l + 1..].find(|c| t.contains(c,),).unwrap();
-			} else if r_reached {
-				break;
-			}
-
-			if (r - l < rslt.len() || rslt.is_empty()) && t_chars.values().all(|&i| i <= 0,) {
-				rslt = s[l..r].to_string();
-				//if t_chars.values().all(|i| i == &0,) { break; }
-			}
-
-			if t_chars.values().any(|i| i > &0,) || t_chars[&s[l..=l].to_string()] >= 0 {
-				match s[r..].find(|c| t.contains(c,),) {
-					Some(i,) => {
-						r += i + 1;
-						t_chars.entry(s[r - 1..r].to_string(),).and_modify(|i| *i -= 1,);
-					},
-					None => {
-						r_reached = true;
-					},
-				};
-			}
-			//println!( "{}{} {} {} {}", " ".repeat(l), s[l..r].to_string(),
-			// t_chars[&"a".to_string()], t_chars[&"b".to_string()], t_chars[&"c".to_string()],);
-		}
-
-		//if t_chars.values().all(|i| i <= &0,) && r - l < rslt.len() { rslt = s[l..r].to_string();
-		// }
-		rslt
+		s[rslt.0..rslt.1].to_string()
 	}
 }
 
@@ -84,12 +56,20 @@ mod tests {
 	}
 
 	#[test]
+	fn test_5() {
+		let mut ans = "a";
+		let mut sol = Solution::min_window("a".to_string(), "a".to_string(),);
+		assert_eq!(ans, sol);
+	}
+
+	#[test]
 	fn test_3() {
 		let mut ans = "";
 		let mut sol = Solution::min_window("a".to_string(), "aa".to_string(),);
 		assert_eq!(ans, sol);
 	}
 
+	// FAIL:
 	#[test]
 	fn test_4() {
 		let mut ans = "babcbcacbbccbaccaaacacabbb";
@@ -113,13 +93,30 @@ mod benchs {
 	use test::black_box;
 	use test::Bencher;
 
-	//	#[bench]
+	#[bench]
 	fn b1(b: &mut Bencher,) {
 		b.iter(|| {
-			// fastest vector init
-			let mut v = vec![0; 1e5 as usize];
-			for i in 0..1e5 as i32 {
-				v[i as usize] = i;
+			let mut h = std::collections::HashMap::new();
+			for i in 0..100 {
+				h.insert(i.to_string(), i,);
+			}
+
+			for i in 0..100 {
+				*h.get_mut(&i.to_string(),).unwrap() += 1;
+			}
+		},)
+	}
+
+	#[bench]
+	fn b2(b: &mut Bencher,) {
+		b.iter(|| {
+			let mut h = std::collections::HashMap::new();
+			for i in 0..100 {
+				h.insert(i.to_string(), i,);
+			}
+
+			for i in 0..100 {
+				h.entry(i.to_string(),).and_modify(|i| *i += 1,);
 			}
 		},)
 	}
