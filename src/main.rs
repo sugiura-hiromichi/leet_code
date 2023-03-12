@@ -7,30 +7,22 @@ struct Solution;
 impl Solution {
 	pub fn combine(n: i32, k: i32,) -> Vec<Vec<i32,>,> {
 		let mut rslt = vec![];
-		if k == 1 {
-			for i in 1..=n {
-				rslt.push(vec![i],);
-			}
-			return rslt;
+		for i in 1..=n - k + 1 {
+			rslt.push(vec![i],);
 		}
 
-		Self::combine(n, k - 1,).iter().for_each(|v| {
-			for i in v[v.len() - 1] + 1..=n {
-				let mut tmp = v.clone();
-				tmp.push(i,);
-				rslt.push(tmp,);
-			}
-		},);
+		for i in 1..k {
+			let mut cl = vec![];
+			rslt.iter().for_each(|v| {
+				for j in v[i as usize - 1] + 1..n - k + i + 2 {
+					let mut v = v.clone();
+					v.push(j,);
+					cl.push(v,);
+				}
+			},);
+			rslt = cl;
+		}
 		rslt
-	}
-
-	fn combination(n: i32, k: i32,) -> usize {
-		let mut rslt = 1;
-		for i in 0..k {
-			rslt *= (n - i);
-			rslt /= (i + 1);
-		}
-		rslt as usize
 	}
 }
 
@@ -73,13 +65,9 @@ mod benchs {
 	#[bench]
 	fn b1(b: &mut Bencher,) {
 		b.iter(|| {
-			let mut h = std::collections::HashMap::new();
-			for i in 0..100 {
-				h.insert(i.to_string(), i,);
-			}
-
-			for i in 0..100 {
-				*h.get_mut(&i.to_string(),).unwrap() += 1;
+			let v = vec![0; 10000];
+			for i in 0..1000 {
+				black_box(v.last(),);
 			}
 		},)
 	}
@@ -87,13 +75,9 @@ mod benchs {
 	#[bench]
 	fn b2(b: &mut Bencher,) {
 		b.iter(|| {
-			let mut h = std::collections::HashMap::new();
-			for i in 0..100 {
-				h.insert(i.to_string(), i,);
-			}
-
-			for i in 0..100 {
-				h.entry(i.to_string(),).and_modify(|i| *i += 1,);
+			let v = vec![0; 10000];
+			for i in 0..1000 {
+				black_box(v[v.len() - 1],);
 			}
 		},)
 	}
