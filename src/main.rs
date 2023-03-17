@@ -6,31 +6,16 @@
 struct Solution;
 impl Solution {
 	pub fn subsets(nums: Vec<i32,>,) -> Vec<Vec<i32,>,> {
-		let (mut start, mut end,) = (0, 0,);
-		let mut rslt = nums.iter().fold(vec![], |mut acc, &x| {
-			acc.push(vec![x],);
-			end += 1;
-			acc
-		},);
-
 		let len = nums.len();
-		while rslt[end - 1].len() < len {
-			for i in start..end {
-				let ith = rslt[i].clone();
-				let mut pos =
-					nums.iter().enumerate().find(|&x| *x.1 == ith[ith.len() - 1],).unwrap().0;
-				while pos < len - 1 {
-					pos += 1;
-					let mut tmp = ith.clone();
-					tmp.push(nums[pos],);
-					rslt.push(tmp,);
+		let p = 1 << len;
+		let mut rslt = vec![vec![]; p];
+		for i in 0..p {
+			for j in 0..len {
+				if (i >> j) & 1 == 1 {
+					rslt[i].push(nums[j],);
 				}
 			}
-			start = end;
-			end = rslt.len();
 		}
-
-		rslt.push(vec![],);
 		rslt
 	}
 }
