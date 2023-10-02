@@ -1,23 +1,44 @@
 // •‿•
+// lua vim.lsp.buf.inlay_hint(0)
 #![allow(unused)]
 #![feature(test)]
 
 /// doc
 struct Solution;
 impl Solution {
-	pub fn subsets(nums: Vec<i32,>,) -> Vec<Vec<i32,>,> {
-		let len = nums.len();
-		let p = 1 << len;
-		let mut rslt = vec![vec![]; p];
-		for i in 0..p {
-			for j in 0..len {
-				if (i >> j) & 1 == 1 {
-					rslt[i].push(nums[j],);
+	pub fn exist(board: Vec<Vec<char,>,>, word: String,) -> bool {
+		enum Direction {
+			Up,
+			Down,
+			Left,
+			Right,
+			None,
+		}
+		let mut candidates = vec![];
+		let mut is_front = true;
+		let (len, r_max, c_max,) = (word.len(), board.len(), board[0].len(),);
+		let (front, back,) = (
+			std::char::from_u32(word.as_bytes()[0] as u32,).unwrap(),
+			std::char::from_u32(word.as_bytes()[len - 1] as u32,).unwrap(),
+		);
+		let (mut r, mut c,) = (0, 0,);
+
+		for i in 0..r_max {
+			for j in 0..c_max {
+				if board[i][j] == front {
+					Self::catch_up(&board, i, j,);
+				} else if board[i][j] == back {
+					Self::catch_up_rev(&board, i, j,);
 				}
 			}
 		}
-		rslt
+
+		todo!()
 	}
+
+	fn catch_up(board: &Vec<Vec<char,>,>, r: usize, c: usize,) -> bool { todo!() }
+
+	fn catch_up_rev(board: &Vec<Vec<char,>,>, r: usize, c: usize,) -> bool { todo!() }
 }
 
 #[cfg(test)]
@@ -26,28 +47,41 @@ mod tests {
 
 	#[test]
 	fn test_1() {
-		let mut ans = vec![
-			vec![],
-			vec![1],
-			vec![2],
-			vec![1, 2],
-			vec![3],
-			vec![1, 3],
-			vec![2, 3],
-			vec![1, 2, 3],
-		];
-		let mut sol = Solution::subsets(vec![1, 2, 3],);
-		ans.sort();
-		sol.sort();
+		let mut ans = true;
+		let mut sol = Solution::exist(
+			vec![vec!['A', 'B', 'C', 'E'], vec!['S', 'F', 'C', 'S'], vec!['A', 'D', 'E', 'E']],
+			"ABCCED".to_string(),
+		);
 		assert_eq!(ans, sol);
 	}
 
 	#[test]
 	fn test_2() {
-		let mut ans = vec![vec![], vec![0]];
-		let mut sol = Solution::subsets(vec![0],);
-		ans.sort();
-		sol.sort();
+		let mut ans = true;
+		let mut sol = Solution::exist(
+			vec![vec!['A', 'B', 'C', 'E'], vec!['S', 'F', 'C', 'S'], vec!['A', 'D', 'E', 'E']],
+			"SEE".to_string(),
+		);
+		assert_eq!(ans, sol);
+	}
+
+	#[test]
+	fn test_3() {
+		let mut ans = false;
+		let mut sol = Solution::exist(
+			vec![vec!['A', 'B', 'C', 'E'], vec!['S', 'F', 'C', 'S'], vec!['A', 'D', 'E', 'E']],
+			"ABCB".to_string(),
+		);
+		assert_eq!(ans, sol);
+	}
+
+	#[test]
+	fn from_bool() {
+		let mut ans = 1;
+		let mut sol = usize::from(true,);
+		assert_eq!(ans, sol);
+		ans = 0;
+		sol = usize::from(false,);
 		assert_eq!(ans, sol);
 	}
 }
