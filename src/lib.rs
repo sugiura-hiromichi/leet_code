@@ -1,67 +1,65 @@
-#![allow(unused)]
-#![feature(test)]
+#![allow(dead_code)]
 
-/// doc
 struct Solution;
 impl Solution {
-	pub fn add_binary(a: String, b: String,) -> String {
-		let (al, bl,) = (a.len(), b.len(),);
-		if al < bl {
-			Self::add_binary(b, a,)
-		} else {
-			let mut a = a.to_owned();
-			let mut increment = 0;
-			for i in (0..al).rev() {
-				if i < al - bl {
-					// case of b is out of index
-					match (&a[i..=i], increment,) {
-						(_, 0,) => break,
-						("0", 1,) => {
-							a.replace_range(i..=i, "1",);
-							increment = 0;
-							break;
-						},
-						("1", 1,) => a.replace_range(i..=i, "0",),
-						_ => unreachable!(),
-					}
-				} else {
-					// case of b can be indexed
-					assert!(i + bl >= al, "{}+{}>{}", i, bl, al);
-					match (&a[i..=i], &b[i + bl - al..=i + bl - al],) {
-						("0", "0",) => {
-							if increment == 1 {
-								a.replace_range(i..=i, "1",);
-								increment = 0;
-							}
-						},
-						("0", "1",) => {
-							if increment == 0 {
-								a.replace_range(i..=i, "1",);
-							} else {
-								increment = 1;
-							}
-						},
-						("1", "0",) => {
-							if increment == 1 {
-								a.replace_range(i..=i, "0",);
-							}
-						},
-						("1", "1",) => {
-							if increment == 0 {
-								a.replace_range(i..=i, "0",);
-								increment = 1;
-							} else {
-								a.replace_range(i..=i, "1",);
-							}
-						},
-						_ => unreachable!(),
-					}
+	pub fn exist(board: Vec<Vec<char,>,>, word: String,) -> bool {
+		let (row, col,) = (board.len(), board[0].len(),);
+		let mut rslt = false;
+
+		'l: for i in 0..row {
+			for j in 0..col {
+				let mut search_map =
+					std::collections::HashSet::<(usize, usize,),>::new();
+				search_map.insert((i, j,),);
+				let mut w = word.chars();
+				if board[i][j]
+					== w.next().expect("`w` must contain more than 1 elements",)
+					&& Self::char_match(search_map, w, &board, i, j,)
+				{
+					rslt = true;
+					break 'l;
 				}
 			}
-			if increment == 1 {
-				a.insert(0, '1',);
+		}
+		rslt
+	}
+
+	/// make sure the b[row][col] == w_val
+	fn char_match(
+		map: std::collections::HashSet<(usize, usize,),>,
+		mut w: std::str::Chars,
+		b: &Vec<Vec<char,>,>,
+		row: usize,
+		col: usize,
+	) -> bool {
+		if let Some(w_val,) = w.next() {
+			let mut cord_list = vec![];
+
+			if row != 0 {
+				//↑
+				cord_list.push((row - 1, col,),);
 			}
-			a
+			if row + 1 != b.len() {
+				//↓
+				cord_list.push((row + 1, col,),);
+			}
+			if col != 0 {
+				//←
+				cord_list.push((row, col - 1,),);
+			}
+			if col + 1 != b[0].len() {
+				//→
+				cord_list.push((row, col + 1,),);
+			}
+
+			cord_list.iter().any(|(r, c,)| {
+				let mut m = map.clone();
+				b[*r][*c] == w_val
+					&& m.insert((*r, *c,),)
+					&& Self::char_match(m, w.clone(), b, *r, *c,)
+			},)
+		} else {
+			true
 		}
 	}
 }
@@ -72,43 +70,64 @@ mod tests {
 
 	#[test]
 	fn test_1() {
-		let mut ans = "100";
-		let mut sol = Solution::add_binary("11".to_string(), "1".to_string(),);
+		let ans = true;
+		let sol = Solution::exist(
+			vec![
+				vec!['A', 'B', 'C', 'E'],
+				vec!['S', 'F', 'C', 'S'],
+				vec!['A', 'D', 'E', 'E'],
+			],
+			"ABCCED".to_string(),
+		);
 		assert_eq!(ans, sol);
 	}
 
 	#[test]
 	fn test_2() {
-		let mut ans = "10101";
-		let mut sol =
-			Solution::add_binary("1010".to_string(), "1011".to_string(),);
+		let ans = true;
+		let sol = Solution::exist(
+			vec![
+				vec!['A', 'B', 'C', 'E'],
+				vec!['S', 'F', 'C', 'S'],
+				vec!['A', 'D', 'E', 'E'],
+			],
+			"SEE".to_string(),
+		);
 		assert_eq!(ans, sol);
 	}
-}
 
-mod benchs {
-	extern crate test;
-	use super::*;
-	use test::black_box;
-	use test::Bencher;
-
-	#[bench]
-	fn b1(b: &mut Bencher,) {
-		b.iter(|| {
-			let v = vec![0; 100];
-			for i in 0..1000 {
-				black_box(v.last(),);
-			}
-		},)
+	#[test]
+	fn test_3() {
+		let ans = false;
+		let sol = Solution::exist(
+			vec![
+				vec!['A', 'B', 'C', 'E'],
+				vec!['S', 'F', 'C', 'S'],
+				vec!['A', 'D', 'E', 'E'],
+			],
+			"ABCB".to_string(),
+		);
+		assert_eq!(ans, sol);
 	}
 
-	#[bench]
-	fn b2(b: &mut Bencher,) {
-		b.iter(|| {
-			let v = vec![0; 100];
-			for i in 0..1000 {
-				black_box(v[v.len() - 1],);
-			}
-		},)
+	#[test]
+	fn test_4() {
+		let ans = false;
+		let sol = Solution::exist(vec![vec!['a', 'a']], "aaa".to_string(),);
+		assert_eq!(ans, sol);
+	}
+
+	#[test]
+	fn test_5() {
+		let ans = true;
+		let sol = Solution::exist(
+			vec![
+				vec!['A', 'B', 'C', 'E'],
+				vec!['S', 'F', 'E', 'S'],
+				vec!['A', 'D', 'E', 'E'],
+			],
+			"ABCESEEEFS".to_string(),
+		);
+		assert_eq!(ans, sol);
 	}
 }
