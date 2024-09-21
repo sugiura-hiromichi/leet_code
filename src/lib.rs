@@ -1,39 +1,56 @@
 #![allow(dead_code)]
 
+#[derive(PartialEq, Eq, Clone, Debug,)]
+pub struct ListNode {
+	pub val:  i32,
+	pub next: Option<Box<ListNode,>,>,
+}
+
+impl ListNode {
+	fn new(val: i32,) -> Self { ListNode { next: None, val, } }
+}
+
 struct Solution;
 impl Solution {
 	/// # Parameters
 	///
-	/// - `1 <= nums.len() <= 5000`
-	/// - `-10^4 <= nums[i] <= 10^4`
-	/// - `nums` is sorted in non-decreasing order, then rotated at an unknown
-	///   pivot
-	/// - `-10^4 <= target <= 10^4`
-	pub fn search(nums: Vec<i32,>, target: i32,) -> bool {
-		let last = nums.len() - 1;
+	/// - The number of nodes in the list is [0,300]
+	/// - `-100<= Nodde.val <= 100`
+	pub fn delete_duplicates(
+		head: Option<Box<ListNode,>,>,
+	) -> Option<Box<ListNode,>,> {
+		let mut last_val = match &head {
+			Some(l,) => l.val - 1,
+			None => return None,
+		};
 
-		match target.cmp(&nums[0],) {
-			// target < nums[0]
-			std::cmp::Ordering::Less => {
-				let mut i = last;
-				loop {
-					match target.cmp(&nums[i],) {
-						std::cmp::Ordering::Less if i != 0 => i -= 1,
-						_ => return target == nums[i],
-					}
-				}
-			},
-			std::cmp::Ordering::Equal => true,
-			std::cmp::Ordering::Greater => {
-				let mut i = 0;
-				loop {
-					match target.cmp(&nums[i],) {
-						std::cmp::Ordering::Greater if i != last => i += 1,
-						_ => return target == nums[i],
-					}
-				}
-			},
+		let mut rslt = ListNode::new(last_val,);
+		let mut p_rslt = &mut rslt;
+		let mut duplicated = false;
+
+		let mut p_head = &head;
+
+		while let Some(node,) = p_head {
+			match (duplicated, last_val == node.val,) {
+				(true, false,) => {
+					duplicated = false;
+					p_rslt.next = Some(Box::new(ListNode::new(node.val,),),);
+					p_rslt = p_rslt.next.as_mut().unwrap();
+				},
+				(false, true,) => duplicated = true,
+				// NOTE: consider the case (false,false). we need to update rslt
+				// in the case
+				(false, false,) => {
+					p_rslt.next = Some(Box::new(ListNode::new(node.val,),),);
+					p_rslt = p_rslt.next.as_mut().unwrap();
+				},
+				_ => (),
+			}
+			last_val = node.val;
+			p_head = &node.next;
 		}
+
+		rslt.next
 	}
 }
 
@@ -41,38 +58,29 @@ impl Solution {
 mod tests {
 	use super::*;
 
+	fn create_list(from: &[i32],) -> Option<Box<ListNode,>,> {
+		if from.len() == 0 {
+			None
+		} else {
+			Some(Box::new(ListNode {
+				val:  from[0],
+				next: create_list(&from[1..],),
+			},),)
+		}
+	}
+
 	#[test]
 	fn test_1() {
-		let ans = true;
-		let sol = Solution::search(vec![2, 5, 6, 0, 0, 1, 2], 0,);
+		let ans = create_list(&[1, 2, 5,],);
+		let sol =
+			Solution::delete_duplicates(create_list(&[1, 2, 3, 3, 4, 4, 5,],),);
 		assert_eq!(ans, sol);
 	}
 
 	#[test]
 	fn test_2() {
-		let ans = false;
-		let sol = Solution::search(vec![2, 5, 6, 0, 0, 1, 2], 3,);
-		assert_eq!(ans, sol);
-	}
-
-	#[test]
-	fn test_3() {
-		let ans = true;
-		let sol = Solution::search(vec![1, 0, 1, 1, 1], 0,);
-		assert_eq!(ans, sol);
-	}
-
-	#[test]
-	fn test_4() {
-		let ans = true;
-		let sol = Solution::search(vec![1, 1, 1, 0, 1], 0,);
-		assert_eq!(ans, sol);
-	}
-
-	#[test]
-	fn test_5() {
-		let ans = true;
-		let sol = Solution::search(vec![1, 1, 0, 1, 1], 0,);
+		let ans = create_list(&[2, 3,],);
+		let sol = Solution::delete_duplicates(create_list(&[1, 1, 1, 2, 3,],),);
 		assert_eq!(ans, sol);
 	}
 }
