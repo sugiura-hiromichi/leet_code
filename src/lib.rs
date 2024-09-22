@@ -19,38 +19,32 @@ impl Solution {
 	pub fn delete_duplicates(
 		head: Option<Box<ListNode,>,>,
 	) -> Option<Box<ListNode,>,> {
-		let mut last_val = match &head {
-			Some(l,) => l.val - 1,
-			None => return None,
-		};
+		let last_val =
+			if let Some(node,) = &head { node.val - 1 } else { return head };
+		Self::builder(head, last_val,)
+	}
 
-		let mut rslt = ListNode::new(last_val,);
-		let mut p_rslt = &mut rslt;
-		let mut duplicated = false;
-
-		let mut p_head = &head;
-
-		while let Some(node,) = p_head {
-			match (duplicated, last_val == node.val,) {
-				(true, false,) => {
-					duplicated = false;
-					p_rslt.next = Some(Box::new(ListNode::new(node.val,),),);
-					p_rslt = p_rslt.next.as_mut().unwrap();
-				},
-				(false, true,) => duplicated = true,
-				// NOTE: consider the case (false,false). we need to update rslt
-				// in the case
-				(false, false,) => {
-					p_rslt.next = Some(Box::new(ListNode::new(node.val,),),);
-					p_rslt = p_rslt.next.as_mut().unwrap();
-				},
-				_ => (),
-			}
-			last_val = node.val;
-			p_head = &node.next;
+	fn builder(
+		list: Option<Box<ListNode,>,>,
+		last_val: i32,
+	) -> Option<Box<ListNode,>,> {
+		match list {
+			Some(node,) => {
+				if node.val != last_val
+					&& ((node.next.is_some()
+						&& node.val != node.next.as_ref().unwrap().val)
+						|| node.next.is_none())
+				{
+					Some(Box::new(ListNode {
+						val:  node.val,
+						next: Self::builder(node.next, node.val,),
+					},),)
+				} else {
+					Self::builder(node.next, node.val,)
+				}
+			},
+			None => None,
 		}
-
-		rslt.next
 	}
 }
 
