@@ -4,38 +4,38 @@ struct Solution;
 impl Solution {
 	/// # Parameters
 	///
-	/// - `1<=heights.len()<=10^5`
+	/// - `1<=heights.len()<=10^5`f ZZ
 	/// - `0<=heights[i] <= 10^4`
 	/// - list is guaranteed to be sorted in ascending order
 	pub fn largest_rectangle_area(heights: Vec<i32,>,) -> i32 {
-		let len = heights.len() - 1;
-		let mut rslt = 0;
+		let len = heights.len();
 
-		// NOTE: When units are max, left edge index(assume `left`) satisfies
-		// `(left==0 || heights[left-1]<heights[left]) &&
-		// (left==heights.len()-1 || heights[left]<=heights[left+1])`
-		// collect indices which satisfies above condition
-		for i in 0..heights.len() {
-			if i == 0 || heights[i - 1] < heights[i]
-			//&& (i == heights.len() - 1 || heights[i] <= heights[i + 1])
-			{
-				let mut j = i;
-				let mut min = heights[i];
-				loop {
-					if heights[j] < min {
-						if (j - i) as i32 * min > rslt {
-							rslt = (j - i) as i32 * min;
-						}
-						min = heights[j];
-					}
-					if j == len {
-						if (j - i + 1) as i32 * min > rslt {
-							rslt = (j - i + 1) as i32 * min;
-						}
-						break;
-					}
-					j += 1;
-				}
+		let mut left_less = vec![0; len];
+		let mut right_less = vec![0; len];
+		left_less[0] = -1;
+		right_less[len - 1] = len;
+
+		for i in 1..len {
+			let mut p = i as i32 - 1;
+			while p >= 0 && heights[p as usize] >= heights[i] {
+				p = left_less[p as usize];
+			}
+			left_less[i] = p;
+		}
+
+		for i in (0..len - 1).rev() {
+			let mut p = i + 1;
+			while p < len && heights[p] >= heights[i] {
+				p = right_less[p];
+			}
+			right_less[i] = p;
+		}
+
+		let mut rslt = 0;
+		for i in 0..len {
+			let rct = heights[i] * (right_less[i] as i32 - left_less[i] - 1);
+			if rct > rslt {
+				rslt = rct;
 			}
 		}
 
@@ -67,6 +67,21 @@ mod tests {
 		let sol = Solution::largest_rectangle_area(vec![
 			10, 1, 1, 1, 1, 1, 1, 1, 1, 4,
 		],);
+		assert_eq!(ans, sol);
+	}
+
+	#[test]
+	fn test_4() {
+		let ans = 3;
+		let sol = Solution::largest_rectangle_area(vec![2, 1, 2],);
+		assert_eq!(ans, sol);
+	}
+
+	#[test]
+	fn test_5() {
+		let ans = 20;
+		let sol =
+			Solution::largest_rectangle_area(vec![3, 6, 5, 7, 4, 8, 1, 0],);
 		assert_eq!(ans, sol);
 	}
 }
