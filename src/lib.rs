@@ -28,7 +28,7 @@ impl Solution {
 					println!("{heights:?}");
 					rslt = Self::largest_rectangle_area(&heights,).max(rslt,);
 					if (r_max - r) * c_max <= rslt {
-						break;
+						return rslt as i32;
 					}
 				}
 				c += 1;
