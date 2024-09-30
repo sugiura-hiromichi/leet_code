@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 
+type List = Option<Box<ListNode,>,>;
 
 #[derive(Debug, PartialEq, Eq, Clone,)]
 pub struct ListNode {
@@ -12,33 +13,27 @@ impl ListNode {
 }
 
 struct Solution;
-type List = Option<Box<ListNode,>,>;
 impl Solution {
-	/// # Parameters
-	///
-	/// - `rows == matrix.length`
-	/// - `cols == matrix.length`
-	/// - `1 <= row` `cols <= 200`
-	/// - `matrix[i][j] = '0' | '1'`
-	pub fn partition(head: List, x: i32,) -> List {
-		let (mut before, mut after,) = (None, None,);
+	pub fn partition(mut head: List, x: i32,) -> List {
+		let (mut before, mut after,) = (ListNode::new(0,), ListNode::new(0,),);
 		let (mut before_tail, mut after_tail,) = (&mut before, &mut after,);
-		let mut p_head = &head;
 
-		while let Some(node,) = p_head {
+		while let Some(mut node,) = head {
+			// this `take()` is required to leave `None` at `node.next` because
+			// node is used later
+			head = node.next.take();
+
 			if node.val < x {
-				*before_tail = Some(Box::new(ListNode::new(node.val,),),);
-				before_tail = &mut before_tail.as_mut().unwrap().next;
+				before_tail.next = Some(node,);
+				before_tail = before_tail.next.as_mut().unwrap();
 			} else {
-				*after_tail = Some(Box::new(ListNode::new(node.val,),),);
-				after_tail = &mut after_tail.as_mut().unwrap().next;
+				after_tail.next = Some(node,);
+				after_tail = after_tail.next.as_mut().unwrap();
 			}
-			p_head = &p_head.as_ref().unwrap().next;
 		}
 
-		*before_tail = after;
-
-		before
+		before_tail.next = after.next;
+		before.next
 	}
 }
 
